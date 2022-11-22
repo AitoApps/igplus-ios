@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfileCard extends StatelessWidget {
   final int followers;
   final int followings;
   final String username;
   final String picture;
+  final bool isSubscribed;
   const ProfileCard({
     Key? key,
     required this.followers,
     required this.followings,
     required this.username,
     required this.picture,
+    this.isSubscribed = false,
   }) : super(key: key);
 
   @override
@@ -37,19 +41,45 @@ class ProfileCard extends StatelessWidget {
                 const Text("Followers", style: TextStyle(fontSize: 16, color: ColorsManager.secondarytextColor)),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.all(10),
-              alignment: Alignment.centerLeft,
-              width: 90.0,
-              height: 90.0,
-              decoration: BoxDecoration(
-                border: const Border.fromBorderSide(BorderSide(color: ColorsManager.secondarytextColor, width: 2)),
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: NetworkImage(picture),
+            Stack(
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  alignment: Alignment.centerLeft,
+                  width: 90.0,
+                  height: 90.0,
+                  decoration: BoxDecoration(
+                    border: Border.fromBorderSide(BorderSide(
+                        color: (isSubscribed) ? Color.fromARGB(255, 212, 148, 10) : Color.fromARGB(255, 211, 211, 211),
+                        width: 2)),
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: NetworkImage(picture),
+                    ),
+                  ),
                 ),
-              ),
+                if (isSubscribed)
+                  Positioned(
+                    bottom: 15,
+                    right: 15,
+                    child: Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(255, 212, 148, 10),
+                        highlightColor: const Color.fromARGB(255, 251, 255, 36),
+                        child: const Icon(
+                          FontAwesomeIcons.crown,
+                          color: Color.fromARGB(255, 212, 148, 10),
+                          size: 20,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 5.0,
+                              color: Colors.black,
+                              offset: Offset(0.0, 0.0),
+                            ),
+                          ],
+                        )),
+                  ),
+              ],
             ),
             Column(
               children: [

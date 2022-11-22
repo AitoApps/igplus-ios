@@ -9,7 +9,8 @@ import 'package:igshark/presentation/views/global/loading_indicator.dart';
 
 class InfoCardList extends StatelessWidget {
   final List<Map> cards;
-  const InfoCardList({Key? key, required this.cards}) : super(key: key);
+  final bool isLoading;
+  const InfoCardList({Key? key, required this.cards, this.isLoading = true}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,8 @@ class InfoCardList extends StatelessWidget {
         subTitle: card["subTitle"],
         context: context,
         type: card["type"],
+        locked: card["locked"],
+        isSubscribed: card["isSubscribed"],
       ));
     }
     return Column(
@@ -27,10 +30,20 @@ class InfoCardList extends StatelessWidget {
     );
   }
 
-  Widget myCard({required String title, String? subTitle, required BuildContext context, int? style, String? type}) {
+  Widget myCard({
+    required String title,
+    String? subTitle,
+    required BuildContext context,
+    int? style,
+    String? type,
+    required bool locked,
+    required bool isSubscribed,
+  }) {
     return BlocBuilder<MediaListCubit, MediaListState>(
       builder: (context, state) {
-        if (state is MediaListInitial) {
+        if (isLoading) {
+          return loadingCard(context, title, subTitle);
+        } else if (state is MediaListInitial) {
           return loadingCard(context, title, subTitle);
         } else if (state is MediaListLoading) {
           return loadingCard(context, title, subTitle);
@@ -39,7 +52,9 @@ class InfoCardList extends StatelessWidget {
         } else if (state is MediaListSuccess) {
           return GestureDetector(
             onTap: () {
-              if (type == "mostLikes" ||
+              if (locked && !isSubscribed) {
+                GoRouter.of(context).pushNamed('paywall');
+              } else if (type == "mostLikes" ||
                   type == "mostComments" ||
                   type == "mostLikesAndComments" ||
                   type == "likersNotFollow" ||
@@ -82,9 +97,15 @@ class InfoCardList extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Icon(FontAwesomeIcons.angleRight, color: ColorsManager.secondarytextColor),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: (locked && !isSubscribed)
+                          ? Icon(
+                              FontAwesomeIcons.lock,
+                              color: ColorsManager.secondarytextColor.withOpacity(0.5),
+                              size: 18.0,
+                            )
+                          : const Icon(FontAwesomeIcons.angleRight, color: ColorsManager.secondarytextColor),
                     ),
                   ],
                 ),
@@ -129,8 +150,8 @@ class InfoCardList extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: LoadingIndicator(),
             ),
           ],

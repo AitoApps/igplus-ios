@@ -67,7 +67,7 @@ class _WhoAdmiresYouListState extends State<WhoAdmiresYouList> {
   Future<void> _fetchPage(pageKey) async {
     try {
       late List<LikesAndComments>? whoAdmiresYou;
-      whoAdmiresYou = await context.read<MediaLikersCubit>().getMostLikesAndCommentsUsers(
+      whoAdmiresYou = await context.read<MediaLikersCubit>().getWhoAdmiresYou(
           boxKey: LikesAndComments.boxKey, pageKey: pageKey, pageSize: _pageSize, searchTerm: _searchTerm);
 
       if (whoAdmiresYou == null || whoAdmiresYou.isEmpty) {

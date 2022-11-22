@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/presentation/blocs/paywall/cubit/paywall_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ThankYouPage extends StatefulWidget {
   const ThankYouPage({Key? key}) : super(key: key);
@@ -47,8 +48,8 @@ class _ThankYouPageState extends State<ThankYouPage> {
                     width: 120.0,
                     height: 120.0,
                     decoration: BoxDecoration(
-                      border:
-                          const Border.fromBorderSide(BorderSide(color: ColorsManager.secondarytextColor, width: 2)),
+                      border: const Border.fromBorderSide(
+                          BorderSide(color: const Color.fromARGB(255, 212, 148, 10), width: 2)),
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         fit: BoxFit.fill,
@@ -56,21 +57,25 @@ class _ThankYouPageState extends State<ThankYouPage> {
                       ),
                     ),
                   ),
-                  const Positioned(
-                      bottom: 20,
-                      right: 15,
-                      child: Icon(
-                        FontAwesomeIcons.crown,
-                        color: Color.fromARGB(255, 245, 180, 27),
-                        size: 25,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 5.0,
-                            color: Colors.black,
-                            offset: Offset(0.0, 0.0),
-                          ),
-                        ],
-                      ))
+                  Positioned(
+                    bottom: 15,
+                    right: 20,
+                    child: Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(255, 212, 148, 10),
+                        highlightColor: const Color.fromARGB(255, 251, 255, 36),
+                        child: const Icon(
+                          FontAwesomeIcons.crown,
+                          color: Color.fromARGB(255, 212, 148, 10),
+                          size: 25,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 5.0,
+                              color: Colors.black,
+                              offset: Offset(0.0, 0.0),
+                            ),
+                          ],
+                        )),
+                  )
                 ],
               ),
               const SizedBox(height: 60),

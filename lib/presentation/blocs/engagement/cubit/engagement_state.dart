@@ -8,3 +8,7 @@ abstract class EngagementState extends Equatable {
 }
 
 class EngagementInitial extends EngagementState {}
+
+class EngagementLoading extends EngagementState {}
+
+class EngagementLoaded extends EngagementState {}

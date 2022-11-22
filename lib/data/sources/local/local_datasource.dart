@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/friend.dart';
 import 'package:http/http.dart' as http;
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/media_commenter.dart';
@@ -52,6 +53,8 @@ abstract class LocalDataSource {
   Future<void> cacheWhoAdmiresYouList({required List<LikesAndComments> whoAdmiresYouList, required String boxKey});
   List<LikesAndComments>? getCachedWhoAdmiresYouList(
       {required String boxKey, int? pageKey, int? pageSize, String? searchTerm});
+  Future<void> cacheIgDataUpdate({required IgDataUpdate igDataUpdate, required String boxKey});
+  IgDataUpdate? getCachedIgDataUpdate({required String boxKey, required String dataName});
 }
 
 class LocalDataSourceImp extends LocalDataSource {
@@ -543,10 +546,8 @@ class LocalDataSourceImp extends LocalDataSource {
     // open box
     Box<LikesAndComments> whoAdmiresYouBox = Hive.box<LikesAndComments>(boxKey);
     // put WhoAdmiresYou in the box
-    int count = 0;
     for (var e in whoAdmiresYouList) {
-      count++;
-      await whoAdmiresYouBox.put(count, e);
+      await whoAdmiresYouBox.put(e.user.username, e);
     }
   }
 
@@ -556,11 +557,26 @@ class LocalDataSourceImp extends LocalDataSource {
       {required String boxKey, int? pageKey, int? pageSize, String? searchTerm}) {
     Box<LikesAndComments> whoAdmiresYouBox = Hive.box<LikesAndComments>(boxKey);
     List<LikesAndComments> whoAdmiresYouList;
+    int? startKey;
+    int? endKey;
 
     if (whoAdmiresYouBox.isEmpty) {
       return null;
     } else {
       whoAdmiresYouList = whoAdmiresYouBox.values.toList();
+
+      if (pageKey != null && pageSize != null) {
+        startKey = pageKey;
+        endKey = startKey + pageSize;
+        if (endKey > whoAdmiresYouList.length - 1) {
+          endKey = whoAdmiresYouList.length;
+        }
+      }
+
+      if (startKey != null && endKey != null && searchTerm == null) {
+        // paginate
+        whoAdmiresYouList = whoAdmiresYouList.sublist(startKey, endKey);
+      }
 
       // search
       if (searchTerm != null) {
@@ -568,6 +584,30 @@ class LocalDataSourceImp extends LocalDataSource {
       }
 
       return whoAdmiresYouList;
+    }
+  }
+
+  // cache IgDataUpdate List
+  @override
+  Future<void> cacheIgDataUpdate({required IgDataUpdate igDataUpdate, required String boxKey}) async {
+    // open box
+    Box<IgDataUpdate> igDataUpdateBox = Hive.box<IgDataUpdate>(boxKey);
+    // put IgDataUpdate in the box
+    await igDataUpdateBox.put(igDataUpdate.dataName, igDataUpdate);
+  }
+
+  // get IgDataUpdate By name from local storage
+  @override
+  IgDataUpdate? getCachedIgDataUpdate({required String boxKey, required String dataName}) {
+    Box<IgDataUpdate> igDataUpdateBox = Hive.box<IgDataUpdate>(boxKey);
+    final IgDataUpdate igDataUpdateList;
+
+    if (igDataUpdateBox.isEmpty) {
+      return null;
+    } else {
+      igDataUpdateList = igDataUpdateBox.values.where((element) => element.dataName == dataName).first;
+
+      return igDataUpdateList;
     }
   }
 

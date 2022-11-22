@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/friend.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/media_commenter.dart';
@@ -98,6 +99,10 @@ abstract class LocalRepository {
   Future<void> cacheWhoAdmiresYouList({required List<LikesAndComments> whoAdmiresYouList, required String boxKey});
   Either<Failure, List<LikesAndComments>?> getCachedWhoAdmiresYouList(
       {required String boxKey, int? pageKey, int? pageSize, String? searchTerm});
+
+  // IgDataUpdate
+  Future<void> cacheIgDataUpdate({required String boxKey, required IgDataUpdate igDataUpdate});
+  Either<Failure, IgDataUpdate?> getCachedIgDataUpdate({required String boxKey, required String dataName});
 
   // clear all boxes
   Future<void> clearAllBoxes();

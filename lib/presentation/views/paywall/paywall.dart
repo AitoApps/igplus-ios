@@ -105,8 +105,8 @@ class _PaywallState extends State<Paywall> {
                         padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
                         child: SizedBox(
                           child: Shimmer.fromColors(
-                            baseColor: Color.fromARGB(255, 212, 148, 10),
-                            highlightColor: Color.fromARGB(255, 220, 255, 22),
+                            baseColor: const Color.fromARGB(255, 212, 148, 10),
+                            highlightColor: const Color.fromARGB(255, 220, 255, 22),
                             child: const Text(
                               'Upgrade to Premium',
                               textAlign: TextAlign.center,
@@ -147,6 +147,7 @@ class _PaywallState extends State<Paywall> {
                                 getCurrency(packages.first.storeProduct.priceString, packages.first.storeProduct.price);
 
                             int counter = 0;
+                            selected = packages[1].storeProduct.identifier;
                             for (var package in packages) {
                               counter++;
                               final product = package.storeProduct;

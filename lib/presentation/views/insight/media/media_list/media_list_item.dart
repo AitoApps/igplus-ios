@@ -43,7 +43,7 @@ class _MediaListItemState extends State<MediaListItem> {
             },
             child: CachedNetworkImage(
               imageUrl: widget.media.url,
-              placeholder: (context, url) => Center(
+              placeholder: (context, url) => const Center(
                 child: LoadingIndicator(),
               ),
               errorWidget: (context, url, error) => const Icon(

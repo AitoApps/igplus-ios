@@ -2,11 +2,14 @@ import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/user.dart';
+import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_feed_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_use_case.dart';
+import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/save_media_to_local_use_case.dart';
 
 part 'media_list_state.dart';
@@ -16,49 +19,69 @@ class MediaListCubit extends Cubit<MediaListState> {
   final GetUserFeedUseCase getUserFeed;
   final GetUserUseCase getUser;
   final CacheMediaToLocalUseCase cacheMediaToLocal;
+  final GetIgDataUpdateUseCase getIgDataUpdateUseCase;
+  final SaveIgDataUpdateUseCase saveIgDataUpdateUseCase;
+
   MediaListCubit({
     required this.getMediaFromLocal,
     required this.getUserFeed,
     required this.getUser,
     required this.cacheMediaToLocal,
-  }) : super(MediaListInitial()) {
-    init();
-  }
-
-  final int pageSize = 10;
+    required this.getIgDataUpdateUseCase,
+    required this.saveIgDataUpdateUseCase,
+  }) : super(MediaListInitial());
 
   Future<void> init() async {
     emit(MediaListLoading());
-    // get media list from local
-    final mediaList = await getMediaListFromLocal(
-      boxKey: Media.boxKey,
-      pageKey: 0,
-      pageSize: pageSize,
-    );
 
-    if (mediaList != null) {
-      emit(MediaListSuccess(mediaList: mediaList, pageKey: 0));
-    } else {
+    // check if StoriesUser is outdated
+    bool isDataOutdated = await checkIfDataOutdated(DataNames.media.name);
+
+    if (isDataOutdated) {
       // get media from instagram
       final mediaList = await getMediaListFromInstagram(
         boxKey: Media.boxKey,
         pageKey: 0,
-        pageSize: pageSize,
       );
 
       if (mediaList != null) {
-        emit(MediaListSuccess(mediaList: mediaList, pageKey: 0));
+        emit(MediaListSuccess());
         // cache new medai list to local
         cacheMediaToLocal.execute(boxKey: Media.boxKey, mediaList: mediaList);
       } else {
         emit(const MediaListFailure(message: 'Failed to get media list from instagram'));
+      }
+    } else {
+      // get media list from local
+      final mediaList = await getMediaListFromLocal(
+        boxKey: Media.boxKey,
+        pageKey: 0,
+        pageSize: 1,
+      );
+
+      if (mediaList != null) {
+        emit(MediaListSuccess());
+      } else {
+        // get media from instagram
+        final mediaList = await getMediaListFromInstagram(
+          boxKey: Media.boxKey,
+          pageKey: 0,
+        );
+
+        if (mediaList != null) {
+          emit(MediaListSuccess());
+          // cache new medai list to local
+          cacheMediaToLocal.execute(boxKey: Media.boxKey, mediaList: mediaList);
+        } else {
+          emit(const MediaListFailure(message: 'Failed to get media list from instagram'));
+        }
       }
     }
   }
 
   // get user feed from instagram
   Future<List<Media>?> getMediaListFromInstagram(
-      {required String boxKey, required int pageKey, required int pageSize, String? searchTerm, String? type}) async {
+      {required String boxKey, required int pageKey, String? searchTerm, String? type}) async {
     late User currentUser;
     // get user info
     final failureOrCurrentUser = await getUser.execute();
@@ -105,5 +128,39 @@ class MediaListCubit extends Cubit<MediaListState> {
         return null;
       }
     }
+  }
+
+  Future<bool> checkIfDataOutdated(String dataName) async {
+    IgDataUpdate igDataUpdate;
+    bool isOutdated = false;
+
+    Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
+    if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
+      // if data is not in local, set it as outdated
+      await resetIgDataUpdate(dataName);
+      isOutdated = true;
+    } else {
+      igDataUpdate = (failureOrIgDataUpdate as Right).value!;
+      // check if data is outdated
+      if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
+        await resetIgDataUpdate(dataName);
+        isOutdated = true;
+      } else {
+        isOutdated = false;
+      }
+    }
+
+    return isOutdated;
+  }
+
+  // update IgDataUpdate next update time
+  Future<void> resetIgDataUpdate(String dataName) async {
+    const nextUpdateInMinutes = 60 * 12;
+
+    IgDataUpdate igDataUpdate = IgDataUpdate.create(
+      dataName: dataName,
+      nextUpdateInMinutes: nextUpdateInMinutes,
+    );
+    await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
   }
 }
