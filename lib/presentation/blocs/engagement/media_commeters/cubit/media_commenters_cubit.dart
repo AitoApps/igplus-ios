@@ -4,15 +4,18 @@ import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/data/models/media_commenters_model.dart';
 import 'package:igshark/domain/entities/friend.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/media_commenter.dart';
 import 'package:igshark/domain/entities/media_commenters.dart';
 import 'package:igshark/domain/entities/user.dart';
 import 'package:igshark/domain/usecases/get_friends_from_local_use_case.dart';
+import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_commenters_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_commenters_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_use_case.dart';
+import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/save_media_commenters_to_local_use_case.dart';
 
 part 'media_commeters_state.dart';
@@ -24,6 +27,8 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
   final GetMediaCommentersFromLocalUseCase getMediaCommentersFromLocalUseCase;
   final GetFriendsFromLocalUseCase getFriendsFromLocalUseCase;
   final GetUserUseCase getUser;
+  final GetIgDataUpdateUseCase getIgDataUpdateUseCase;
+  final SaveIgDataUpdateUseCase saveIgDataUpdateUseCase;
   MediaCommentersCubit({
     required this.getMediaCommentersUseCase,
     required this.getUser,
@@ -31,6 +36,8 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
     required this.cacheMediaCommentersToLocalUseCase,
     required this.getMediaCommentersFromLocalUseCase,
     required this.getFriendsFromLocalUseCase,
+    required this.getIgDataUpdateUseCase,
+    required this.saveIgDataUpdateUseCase,
   }) : super(MediaCommentersInitial());
 
   Future<List<MediaCommenter>?> init({
@@ -43,17 +50,11 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
     List<MediaCommenter> mediaCommentersList = [];
     List<Media> mediaList;
 
-    // get media commenters from local
-    final mediaCommentersFromLocal = getMediaCommentersFromLocalUseCase.execute(
-        boxKey: MediaCommenter.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+    // check if madiaCommenters data is outdated
+    bool isDataOutdated = await checkIfDataOutdated(DataNames.mediaCommenters.name);
 
-    if (mediaCommentersFromLocal.isRight() && mediaCommentersFromLocal.getOrElse(() => null) != null) {
-      mediaCommentersList = mediaCommentersFromLocal.getOrElse(() => null)!;
-      emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
-      return mediaCommentersList;
-    }
-    if (mediaCommentersList.isEmpty) {
-      // get media list from local
+    if (isDataOutdated) {
+// get media list from local
       Either<Failure, List<Media>?>? mediaListOrFailure =
           await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
 
@@ -75,6 +76,42 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
         }
         emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
         return mediaCommentersList;
+      }
+    } else {
+      // get media commenters from local
+      final mediaCommentersFromLocal = getMediaCommentersFromLocalUseCase.execute(
+          boxKey: MediaCommenter.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+      if (mediaCommentersFromLocal.isRight() && mediaCommentersFromLocal.getOrElse(() => null) != null) {
+        mediaCommentersList = mediaCommentersFromLocal.getOrElse(() => null)!;
+        emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
+        return mediaCommentersList;
+      }
+
+      if (mediaCommentersList.isEmpty) {
+        // get media list from local
+        Either<Failure, List<Media>?>? mediaListOrFailure =
+            await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
+
+        if (mediaListOrFailure != null && mediaListOrFailure.isRight()) {
+          mediaList = mediaListOrFailure.getOrElse(() => null) ?? [];
+
+          for (var media in mediaList) {
+            // get media commenters from instagram
+            List<MediaCommenter>? mediaCommenters =
+                await getMediaCommenters(mediaId: media.id, boxKey: MediaCommenter.boxKey);
+            if (mediaCommenters != null) {
+              mediaCommentersList.addAll(mediaCommenters);
+              // save media commenters to local
+              await cacheMediaCommentersToLocalUseCase.execute(
+                  boxKey: MediaCommenter.boxKey, mediaCommentersList: mediaCommenters);
+            }
+
+            await Future.delayed(const Duration(seconds: 2));
+          }
+          emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
+          return mediaCommentersList;
+        }
       }
     }
     return null;
@@ -252,5 +289,39 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
         .removeWhere((element) => followersList.indexWhere((friend) => friend.igUserId == element.user.igUserId) != -1);
 
     return mediaLikersList;
+  }
+
+  Future<bool> checkIfDataOutdated(String dataName) async {
+    IgDataUpdate igDataUpdate;
+    bool isOutdated = false;
+
+    Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
+    if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
+      // if data is not in local, set it as outdated
+      await resetIgDataUpdate(dataName);
+      isOutdated = true;
+    } else {
+      igDataUpdate = (failureOrIgDataUpdate as Right).value!;
+      // check if data is outdated
+      if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
+        await resetIgDataUpdate(dataName);
+        isOutdated = true;
+      } else {
+        isOutdated = false;
+      }
+    }
+
+    return isOutdated;
+  }
+
+  // update IgDataUpdate next update time
+  Future<void> resetIgDataUpdate(String dataName) async {
+    const nextUpdateInMinutes = 60 * 2;
+
+    IgDataUpdate igDataUpdate = IgDataUpdate.create(
+      dataName: dataName,
+      nextUpdateInMinutes: nextUpdateInMinutes,
+    );
+    await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
   }
 }

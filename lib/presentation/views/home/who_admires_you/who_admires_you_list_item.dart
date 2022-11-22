@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/follow_unfollow_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -37,16 +38,8 @@ class _WhoAdmiresYouListItemState extends State<WhoAdmiresYouListItem> {
         tileColor: ColorsManager.cardBack,
         leading: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.whoAdmiresYou.user.username),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: CachedNetworkImageProvider(
-              widget.whoAdmiresYou.user.picture,
-              errorListener: () => const Icon(
-                FontAwesomeIcons.image,
-                color: ColorsManager.appBack,
-              ),
-            ),
-          ),
+          child: CircularCachedImage(
+              picture: widget.whoAdmiresYou.user.picture, username: widget.whoAdmiresYou.user.username),
         ),
         title: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.whoAdmiresYou.user.username),

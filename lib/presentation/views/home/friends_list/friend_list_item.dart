@@ -5,6 +5,7 @@ import 'package:igshark/domain/entities/friend.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/follow_unfollow_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -46,16 +47,7 @@ class _FriendListItemState extends State<FriendListItem> {
         tileColor: ColorsManager.cardBack,
         leading: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.friend.username),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: CachedNetworkImageProvider(
-              widget.friend.picture,
-              errorListener: () => const Icon(
-                FontAwesomeIcons.image,
-                color: ColorsManager.appBack,
-              ),
-            ),
-          ),
+          child: CircularCachedImage(picture: widget.friend.picture, username: widget.friend.username),
         ),
         title: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.friend.username),

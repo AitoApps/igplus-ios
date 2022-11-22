@@ -6,6 +6,7 @@ import 'package:igshark/domain/entities/story_viewer.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/follow_unfollow_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -46,16 +47,7 @@ class _StoryViewerListItemState extends State<StoryViewerListItem> {
         leading: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.storyViewer.user.username),
           child: Stack(children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: CachedNetworkImageProvider(
-                widget.storyViewer.user.picture,
-                errorListener: () => const Icon(
-                  FontAwesomeIcons.image,
-                  color: ColorsManager.appBack,
-                ),
-              ),
-            ),
+            CircularCachedImage(picture: widget.storyViewer.user.picture, username: widget.storyViewer.user.username),
             (widget.storyViewer.hasLiked)
                 ? const Positioned(
                     bottom: 0,

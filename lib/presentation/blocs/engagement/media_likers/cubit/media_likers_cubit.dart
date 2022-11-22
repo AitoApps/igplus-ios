@@ -4,18 +4,21 @@ import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/data/models/media_likers_model.dart';
 import 'package:igshark/domain/entities/friend.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/media_liker.dart';
 import 'package:igshark/domain/entities/media_likers.dart';
 import 'package:igshark/domain/entities/user.dart';
 import 'package:igshark/domain/usecases/get_friends_from_local_use_case.dart';
+import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_likers_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_likers_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_feed_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_use_case.dart';
 import 'package:igshark/domain/usecases/get_who_admires_you_from_local_use_case.dart';
+import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/save_media_likers_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_media_to_local_use_case.dart';
 
@@ -31,6 +34,8 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
   final CacheMediaToLocalUseCase cacheMediaToLocal;
   final GetUserFeedUseCase getUserFeed;
   final GetWhoAdmiresYouFromLocalUseCase getWhoAdmiresYouFromLocalUseCase;
+  final GetIgDataUpdateUseCase getIgDataUpdateUseCase;
+  final SaveIgDataUpdateUseCase saveIgDataUpdateUseCase;
   MediaLikersCubit({
     required this.getMediaLikersUseCase,
     required this.getUser,
@@ -41,6 +46,8 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
     required this.cacheMediaToLocal,
     required this.getUserFeed,
     required this.getWhoAdmiresYouFromLocalUseCase,
+    required this.getIgDataUpdateUseCase,
+    required this.saveIgDataUpdateUseCase,
   }) : super(MediaLikersInitial());
 
   Future<List<MediaLiker>?> init({
@@ -53,16 +60,10 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
     List<MediaLiker> mediaLikersList = [];
     List<Media> mediaList;
 
-    // get media likers from local
-    final mediaLikersFromLocal = getMediaLikersFromLocalUseCase.execute(
-        boxKey: MediaLiker.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+    // check if madiaLikers data is outdated
+    bool isDataOutdated = await checkIfDataOutdated(DataNames.mediaLikers.name);
 
-    if (mediaLikersFromLocal.isRight() && mediaLikersFromLocal.getOrElse(() => null) != null) {
-      mediaLikersList = mediaLikersFromLocal.getOrElse(() => null)!;
-      emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
-      return mediaLikersList;
-    }
-    if (mediaLikersList.isEmpty) {
+    if (isDataOutdated) {
       // get media list from local
       Either<Failure, List<Media>?>? mediaListOrFailure =
           await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
@@ -86,6 +87,42 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
       } else {
         emit(const MediaLikersFailure(message: "We can't load media list, try again later"));
         return null;
+      }
+    } else {
+      // get media likers from local
+      final mediaLikersFromLocal = getMediaLikersFromLocalUseCase.execute(
+          boxKey: MediaLiker.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+      if (mediaLikersFromLocal.isRight() && mediaLikersFromLocal.getOrElse(() => null) != null) {
+        mediaLikersList = mediaLikersFromLocal.getOrElse(() => null)!;
+        emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
+        return mediaLikersList;
+      }
+      if (mediaLikersList.isEmpty) {
+        // get media list from local
+        Either<Failure, List<Media>?>? mediaListOrFailure =
+            await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
+
+        if (mediaListOrFailure != null && mediaListOrFailure.isRight()) {
+          mediaList = mediaListOrFailure.getOrElse(() => null) ?? [];
+
+          for (var media in mediaList) {
+            // get media likers from instagram
+            List<MediaLiker>? mediaLikers = await getMediaLikers(mediaId: media.id, boxKey: MediaLiker.boxKey);
+            if (mediaLikers != null) {
+              mediaLikersList.addAll(mediaLikers);
+              // save media likers to local
+              await cacheMediaLikersToLocalUseCase.execute(boxKey: MediaLiker.boxKey, mediaLikersList: mediaLikers);
+            }
+
+            await Future.delayed(const Duration(seconds: 2));
+          }
+          emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
+          return mediaLikersList;
+        } else {
+          emit(const MediaLikersFailure(message: "We can't load media list, try again later"));
+          return null;
+        }
       }
     }
     return null;
@@ -235,20 +272,16 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
   }
 
   // get users with most likes and comments from local
-  Future<List<LikesAndComments>?> getMostLikesAndCommentsUsers(
+  Future<List<LikesAndComments>?> getWhoAdmiresYou(
       {required String boxKey, required int pageKey, required int pageSize, String? searchTerm}) async {
     emit(MediaLikersLoading());
     List<LikesAndComments> mostLikesAndComments = [];
 
-    final failureOrWhoAdmiresYouListFromLocal =
-        getWhoAdmiresYouFromLocalUseCase.execute(boxKey: LikesAndComments.boxKey, pageKey: 0, pageSize: 26);
+    final failureOrWhoAdmiresYouListFromLocal = getWhoAdmiresYouFromLocalUseCase.execute(
+        boxKey: LikesAndComments.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
     if (failureOrWhoAdmiresYouListFromLocal.isRight() && (failureOrWhoAdmiresYouListFromLocal as Right).value != null) {
       mostLikesAndComments = (failureOrWhoAdmiresYouListFromLocal as Right).value;
     }
-
-    // get users who admires you
-    mostLikesAndComments =
-        mostLikesAndComments.where((element) => (element.total > 2 && element.followedBy == true)).toList();
 
     return mostLikesAndComments;
   }
@@ -280,5 +313,39 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
         .removeWhere((element) => followersList.indexWhere((friend) => friend.igUserId == element.user.igUserId) != -1);
 
     return mediaLikersList;
+  }
+
+  Future<bool> checkIfDataOutdated(String dataName) async {
+    IgDataUpdate igDataUpdate;
+    bool isOutdated = false;
+
+    Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
+    if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
+      // if data is not in local, set it as outdated
+      await resetIgDataUpdate(dataName);
+      isOutdated = true;
+    } else {
+      igDataUpdate = (failureOrIgDataUpdate as Right).value!;
+      // check if data is outdated
+      if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
+        await resetIgDataUpdate(dataName);
+        isOutdated = true;
+      } else {
+        isOutdated = false;
+      }
+    }
+
+    return isOutdated;
+  }
+
+  // update IgDataUpdate next update time
+  Future<void> resetIgDataUpdate(String dataName) async {
+    const nextUpdateInMinutes = 60 * 2;
+
+    IgDataUpdate igDataUpdate = IgDataUpdate.create(
+      dataName: dataName,
+      nextUpdateInMinutes: nextUpdateInMinutes,
+    );
+    await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
   }
 }

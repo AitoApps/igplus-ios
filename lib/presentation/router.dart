@@ -21,7 +21,7 @@ import 'package:igshark/presentation/views/tab_page.dart';
 GoRouter routes(AppBloc appBloc) {
   final Stream stream = appBloc.stream;
   return GoRouter(
-    initialLocation: '/home/paywall',
+    initialLocation: '/home',
     debugLogDiagnostics: true,
     routes: [
       GoRoute(

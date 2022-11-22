@@ -9,7 +9,6 @@ import 'package:igshark/presentation/resources/theme_manager.dart';
 import 'package:igshark/presentation/views/insight/media/media_list/media_list_item.dart';
 import 'package:igshark/presentation/views/insight/media/media_list/media_search.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MediaList extends StatefulWidget {
   const MediaList({Key? key, required this.type}) : super(key: key);
@@ -31,7 +30,7 @@ class _MediaListState extends State<MediaList> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
@@ -54,8 +53,6 @@ class _MediaListState extends State<MediaList> {
 
     _scrollController = ScrollController();
     _searchFocusNode = FocusNode();
-
-    super.initState();
   }
 
   @override

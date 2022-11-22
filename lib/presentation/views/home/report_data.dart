@@ -41,6 +41,7 @@ class ReportData extends StatelessWidget {
                 followings: accountInfo.followings,
                 username: accountInfo.username,
                 picture: accountInfo.picture,
+                isSubscribed: isSubscribed,
               ),
             ),
             // (report != null) ? LineChartSample(chartData: report!.followersChartData) : Container(),

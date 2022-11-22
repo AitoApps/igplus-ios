@@ -1,8 +1,4 @@
 PODS:
-  - Adapty (1.17.7)
-  - adapty_flutter (1.0.0):
-    - Adapty (= 1.17.7)
-    - Flutter
   - cloud_firestore (3.4.6):
     - Firebase/Firestore (= 9.4.0)
     - firebase_core
@@ -119,7 +115,6 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - adapty_flutter (from `.symlinks/plugins/adapty_flutter/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -136,7 +131,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - Adapty
     - Firebase
     - FirebaseAppCheckInterop
     - FirebaseAuth
@@ -158,8 +152,6 @@ SPEC REPOS:
     - RevenueCat
 
 EXTERNAL SOURCES:
-  adapty_flutter:
-    :path: ".symlinks/plugins/adapty_flutter/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_functions:
@@ -194,8 +186,6 @@ CHECKOUT OPTIONS:
     :tag: 9.4.0
 
 SPEC CHECKSUMS:
-  Adapty: 7b0d95d78b86df348dd9c488c6955624f671e53a
-  adapty_flutter: 27f1022f0c2b0777ad4cac3561d61747e1db13ae
   cloud_firestore: 6448075c9bac372319e7f025fdfa6f1d382644d7
   cloud_functions: 9b8b0a1d9bd9d0a95674bf91856491c241f57576
   Firebase: 7703fc4022824b6d6db1bf7bea58d13b8e17ec46

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:igshark/app/constants/media_constants.dart';
 import 'package:igshark/domain/entities/stories_user.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/loading_indicator.dart';
 import 'package:story_view/story_view.dart';
 
@@ -139,7 +140,7 @@ class _StoriesViewState extends State<StoriesView> {
                   ],
                 ));
           } else {
-            return Center(child: LoadingIndicator());
+            return const Center(child: LoadingIndicator());
           }
         },
       ),
@@ -163,10 +164,7 @@ Widget _buildProfileView({required StoryOwner storyOwner, required int takenAt, 
               children: [
                 const Icon(FontAwesomeIcons.angleLeft, color: Colors.white, size: 16),
                 const SizedBox(width: 6.0),
-                CircleAvatar(
-                  radius: 20.0,
-                  backgroundImage: NetworkImage(storyOwner.profilePicUrl),
-                ),
+                CircularCachedImage(picture: storyOwner.profilePicUrl, username: storyOwner.username),
               ],
             ),
             const SizedBox(width: 8.0),

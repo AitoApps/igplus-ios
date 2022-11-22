@@ -20,15 +20,4 @@ class MediaListFailure extends MediaListState {
   List<Object> get props => [message];
 }
 
-class MediaListSuccess extends MediaListState {
-  final List<Media> mediaList;
-  final int pageKey;
-
-  const MediaListSuccess({
-    required this.mediaList,
-    required this.pageKey,
-  });
-
-  @override
-  List<Object> get props => [mediaList, pageKey];
-}
+class MediaListSuccess extends MediaListState {}

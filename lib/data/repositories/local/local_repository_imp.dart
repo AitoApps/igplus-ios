@@ -3,6 +3,7 @@ import 'package:igshark/data/failure.dart';
 import 'package:igshark/data/sources/local/local_datasource.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/friend.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/media_commenter.dart';
@@ -262,11 +263,31 @@ class LocalRepositoryImpl implements LocalRepository {
   Either<Failure, List<LikesAndComments>?> getCachedWhoAdmiresYouList(
       {required String boxKey, int? pageKey, int? pageSize, String? searchTerm}) {
     try {
-      final List<LikesAndComments>? cachedWhoAdmiresYouList =
-          localDataSource.getCachedWhoAdmiresYouList(boxKey: boxKey);
+      final List<LikesAndComments>? cachedWhoAdmiresYouList = localDataSource.getCachedWhoAdmiresYouList(
+          boxKey: boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
       return Right(cachedWhoAdmiresYouList);
     } catch (e) {
       return const Left(InvalidParamsFailure("getCachedWhoAdmiresYouList catch"));
+    }
+  }
+
+  // IgDataUpdate
+  @override
+  Future<void> cacheIgDataUpdate({required IgDataUpdate igDataUpdate, required String boxKey}) async {
+    await localDataSource.cacheIgDataUpdate(
+      igDataUpdate: igDataUpdate,
+      boxKey: boxKey,
+    );
+  }
+
+  @override
+  Either<Failure, IgDataUpdate?> getCachedIgDataUpdate({required String boxKey, required String dataName}) {
+    try {
+      final IgDataUpdate? cachedIgDataUpdate =
+          localDataSource.getCachedIgDataUpdate(boxKey: boxKey, dataName: dataName);
+      return Right(cachedIgDataUpdate);
+    } catch (e) {
+      return const Left(InvalidParamsFailure("getCachedIgDataUpdate catch"));
     }
   }
 

@@ -107,14 +107,16 @@ class InfoCard extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-              top: 20,
-              right: 20,
-              child: Icon(
-                FontAwesomeIcons.lock,
-                color: ColorsManager.cardIconColor.withOpacity(0.3),
-                size: 20,
-              )),
+          (!isSubscribed)
+              ? Positioned(
+                  top: 20,
+                  right: 20,
+                  child: Icon(
+                    FontAwesomeIcons.lock,
+                    color: ColorsManager.cardIconColor.withOpacity(0.3),
+                    size: 20,
+                  ))
+              : const SizedBox.shrink(),
         ]),
       );
     } else {
