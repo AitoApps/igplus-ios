@@ -1,7 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
+
+import 'package:gallery_saver/gallery_saver.dart';
+
 import 'package:igshark/domain/entities/ig_data_update.dart';
+
 import 'package:igshark/domain/entities/stories_user.dart';
 import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_stories_from_local_use_case.dart';
@@ -10,10 +15,13 @@ import 'package:igshark/domain/usecases/get_stories_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_use_case.dart';
 import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/save_stories_to_local_use_case.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:story_view/story_view.dart';
 
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/story.dart';
+
+import '../../../../../app/constants/media_constants.dart';
 
 part 'stories_state.dart';
 

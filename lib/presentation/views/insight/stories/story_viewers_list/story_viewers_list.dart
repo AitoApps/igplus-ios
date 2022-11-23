@@ -31,7 +31,6 @@ class _StoryViewersState extends State<StoryViewersList> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });

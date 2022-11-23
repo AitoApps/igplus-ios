@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+
+
+import 'story_download_button.dart';
+
 import 'package:igshark/app/constants/media_constants.dart';
 import 'package:igshark/domain/entities/stories_user.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/loading_indicator.dart';
+
 import 'package:story_view/story_view.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
@@ -16,9 +21,10 @@ import 'package:igshark/domain/entities/story.dart';
 import 'package:igshark/presentation/blocs/home/stories/cubit/stories_cubit.dart';
 
 class StoriesView extends StatefulWidget {
-  const StoriesView({Key? key, required this.storyOwner}) : super(key: key);
+  StoriesView({Key? key, required this.storyOwner}) : super(key: key);
 
   final StoryOwner storyOwner;
+  late Story currentStory;
 
   @override
   State<StoriesView> createState() => _StoriesViewState();
@@ -84,6 +90,17 @@ class _StoriesViewState extends State<StoriesView> {
               }
             }).toList();
 
+            widget.currentStory = stories.firstWhere(
+              (story) {
+                if (story != null &&
+                    (story.mediaType == MediaConstants.TYPE_IMAGE || story.mediaType == MediaConstants.TYPE_VIDEO)) {
+                  return true;
+                } else {
+                  return false;
+                }
+              },
+            )!;
+
             return GestureDetector(
                 onHorizontalDragEnd: (dragUpdateDetails) {
                   if (dragUpdateDetails.primaryVelocity != null) {
@@ -110,6 +127,11 @@ class _StoriesViewState extends State<StoriesView> {
                       onComplete: () {
                         Navigator.of(context).pop();
                       },
+                      onStoryShow: (s) {
+                        print("${stories[storyItems.indexOf(s)]!.takenAt} is shown");
+
+                        widget.currentStory = stories[storyItems.indexOf(s)]!;
+                      },
                     ),
                     Container(
                       height: MediaQuery.of(context).size.height * 0.15,
@@ -133,10 +155,18 @@ class _StoriesViewState extends State<StoriesView> {
                         right: 16,
                       ),
                       child: _buildProfileView(
-                          storyOwner: state.storyOwner,
-                          takenAt: (stories[0] != null) ? stories[0]!.takenAt : DateTime.now().millisecondsSinceEpoch,
-                          context: context),
-                    )
+                        storyOwner: state.storyOwner,
+                        takenAt: (stories[0] != null) ? stories[0]!.takenAt : DateTime.now().millisecondsSinceEpoch,
+                        context: context,
+                      ),
+                    ),
+                    Positioned(
+                      top: MediaQuery.of(context).size.height * 0.08,
+                      right: 16,
+                      child: DownloadStory(
+                        currentStory: widget.currentStory,
+                      ),
+                    ),
                   ],
                 ));
           } else {
