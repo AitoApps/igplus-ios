@@ -8,6 +8,7 @@ import 'package:igshark/app/app.dart';
 import 'package:igshark/app/bloc/app_bloc.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/friend.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/media.dart';
 import 'package:igshark/domain/entities/media_commenter.dart';
@@ -16,6 +17,7 @@ import 'package:igshark/domain/entities/report.dart';
 import 'package:igshark/domain/entities/stories_user.dart';
 import 'package:igshark/domain/entities/story.dart';
 import 'package:igshark/domain/entities/story_viewer.dart';
+import 'package:igshark/presentation/blocs/engagement/cubit/engagement_cubit.dart';
 import 'package:igshark/presentation/blocs/engagement/media_commeters/cubit/media_commenters_cubit.dart';
 import 'package:igshark/presentation/blocs/engagement/media_likers/cubit/media_likers_cubit.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
@@ -54,6 +56,7 @@ void main() async {
   Hive.registerAdapter(MediaLikerAdapter());
   Hive.registerAdapter(MediaCommenterAdapter());
   Hive.registerAdapter(LikesAndCommentsAdapter());
+  Hive.registerAdapter(IgDataUpdateAdapter());
 
   // loading the <key,values> pair from the local storage into memory
   try {
@@ -83,6 +86,8 @@ void main() async {
     await Hive.openBox<MediaCommenter>(MediaCommenter.boxKey);
     // who admires you box
     await Hive.openBox<LikesAndComments>(LikesAndComments.boxKey);
+    // IgDataUpdate box
+    await Hive.openBox<IgDataUpdate>(IgDataUpdate.boxKey);
   } catch (e) {
     debugPrint(e.toString());
   }
@@ -112,6 +117,7 @@ void main() async {
         BlocProvider<MediaCommentersCubit>(create: (_) => di.sl<MediaCommentersCubit>()),
         BlocProvider<SubscriptionCubit>(create: (_) => di.sl<SubscriptionCubit>()),
         BlocProvider<PaywallCubit>(create: (_) => di.sl<PaywallCubit>()),
+        BlocProvider<EngagementCubit>(create: (_) => di.sl<EngagementCubit>()),
         BlocProvider<AppBloc>(create: (_) => di.sl<AppBloc>()),
         BlocProvider<StoryDownloadCubit>(create: (_) => di.sl<StoryDownloadCubit>()),
       ],

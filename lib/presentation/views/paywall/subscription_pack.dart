@@ -1,10 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:igshark/presentation/blocs/paywall/cubit/paywall_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SubscriptionPack extends StatefulWidget {

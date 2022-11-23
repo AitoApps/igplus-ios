@@ -14,6 +14,7 @@ import 'package:igshark/domain/repositories/local/local_repository.dart';
 import 'package:igshark/domain/usecases/clear_local_data_use_case.dart';
 import 'package:igshark/domain/usecases/follow_user_use_case.dart';
 import 'package:igshark/domain/usecases/get_account_info_from_local_use_case.dart';
+import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_commenters_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_commenters_use_case.dart';
 import 'package:igshark/domain/usecases/get_media_from_local_use_case.dart';
@@ -36,10 +37,12 @@ import 'package:igshark/domain/usecases/save_media_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_stories_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_stories_user_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_story_viewers_to_local_use_case.dart';
+import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/sign_up_with_cstom_token_use_case.dart';
 import 'package:igshark/domain/usecases/unfollow_user_use_case%20copy.dart';
 import 'package:igshark/domain/usecases/update_report_use_case.dart';
 import 'package:igshark/domain/usecases/update_story_by_id_use_case.dart';
+import 'package:igshark/presentation/blocs/engagement/cubit/engagement_cubit.dart';
 import 'package:igshark/presentation/blocs/engagement/media_commeters/cubit/media_commenters_cubit.dart';
 import 'package:igshark/presentation/blocs/engagement/media_likers/cubit/media_likers_cubit.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
@@ -94,6 +97,8 @@ Future<void> init() async {
         clearAllBoxesUseCase: sl(),
         authRepository: sl(),
         getWhoAdmiresYouFromLocalUseCase: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
 
   sl.registerFactory(() =>
@@ -104,18 +109,24 @@ Future<void> init() async {
         getStoriesUsersFromLocal: sl(),
         cacheStoriesUsersToLocal: sl(),
         cacheStoriesToLocal: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => StoriesCubit(
         getStories: sl(),
         getUser: sl(),
         getStoriesFromLocal: sl(),
         cacheStoriesToLocal: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => MediaListCubit(
         getMediaFromLocal: sl(),
         getUser: sl(),
         cacheMediaToLocal: sl(),
         getUserFeed: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => StoriesInsightCubit(
         getStoriesFromLocal: sl(),
@@ -142,6 +153,8 @@ Future<void> init() async {
         getUserFeed: sl(),
         cacheMediaToLocal: sl(),
         getWhoAdmiresYouFromLocalUseCase: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => AppBloc(authRepository: sl()));
   sl.registerFactory(() => MediaCommentersCubit(
@@ -151,9 +164,12 @@ Future<void> init() async {
         getMediaCommentersUseCase: sl(),
         cacheMediaCommentersToLocalUseCase: sl(),
         getMediaCommentersFromLocalUseCase: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => SubscriptionCubit());
   sl.registerFactory(() => PaywallCubit(getAccountInfoFromLocalUseCase: sl()));
+  sl.registerFactory(() => EngagementCubit());
 
   sl.registerFactory(() => StoryDownloadCubit());
 
@@ -200,6 +216,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CacheMediaCommentersToLocalUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => GetMediaCommentersFromLocalUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => GetWhoAdmiresYouFromLocalUseCase(localRepository: sl()));
+  sl.registerLazySingleton(() => GetIgDataUpdateUseCase(localRepository: sl()));
+  sl.registerLazySingleton(() => SaveIgDataUpdateUseCase(localRepository: sl()));
 
   // Repositories
   sl.registerLazySingleton<FirebaseRepository>(() => FirebaseRepositporyImp(firebaseDataSource: sl()));

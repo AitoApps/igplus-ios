@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/constants/media_constants.dart';
-import '../../../../domain/entities/stories_user.dart';
-import '../../../resources/colors_manager.dart';
-import '../../global/loading_indicator.dart';
+
+
 import 'story_download_button.dart';
+
+import 'package:igshark/app/constants/media_constants.dart';
+import 'package:igshark/domain/entities/stories_user.dart';
+import 'package:igshark/presentation/resources/colors_manager.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
+import 'package:igshark/presentation/views/global/loading_indicator.dart';
+
 import 'package:story_view/story_view.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
@@ -189,10 +194,7 @@ Widget _buildProfileView({required StoryOwner storyOwner, required int takenAt, 
               children: [
                 const Icon(FontAwesomeIcons.angleLeft, color: Colors.white, size: 16),
                 const SizedBox(width: 6.0),
-                CircleAvatar(
-                  radius: 20.0,
-                  backgroundImage: NetworkImage(storyOwner.profilePicUrl),
-                ),
+                CircularCachedImage(picture: storyOwner.profilePicUrl, username: storyOwner.username),
               ],
             ),
             const SizedBox(width: 8.0),

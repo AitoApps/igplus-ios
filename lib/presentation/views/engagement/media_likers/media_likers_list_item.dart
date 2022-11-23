@@ -1,11 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:igshark/domain/entities/media_likers.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/follow_unfollow_button.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 /// List item representing a single Character with its photo and name.
 class MediaLikersListItem extends StatefulWidget {
@@ -38,16 +37,9 @@ class _MediaLikersListItemState extends State<MediaLikersListItem> {
         tileColor: ColorsManager.cardBack,
         leading: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.mediaLikers.mediaLikerList.first.user.username),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: CachedNetworkImageProvider(
-              widget.mediaLikers.mediaLikerList.first.user.picture,
-              errorListener: () => const Icon(
-                FontAwesomeIcons.image,
-                color: ColorsManager.appBack,
-              ),
-            ),
-          ),
+          child: CircularCachedImage(
+              picture: widget.mediaLikers.mediaLikerList.first.user.picture,
+              username: widget.mediaLikers.mediaLikerList.first.user.username),
         ),
         title: GestureDetector(
           onTap: () => _openProfileLinkOnInsta(widget.mediaLikers.mediaLikerList.first.user.username),

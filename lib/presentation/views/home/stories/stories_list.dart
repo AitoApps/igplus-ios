@@ -17,6 +17,7 @@ class StoriesList extends StatefulWidget {
 class _StoriesListState extends State<StoriesList> {
   @override
   void initState() {
+    super.initState();
     context.read<UserStoriesCubit>().init();
   }
 
@@ -33,7 +34,7 @@ class _StoriesListState extends State<StoriesList> {
                   child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: 82.00,
-                child: Center(
+                child: const Center(
                   child: LoadingIndicator(),
                 ),
               ));
@@ -42,7 +43,7 @@ class _StoriesListState extends State<StoriesList> {
                   child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: 82.00,
-                child: Center(
+                child: const Center(
                   child: LoadingIndicator(),
                 ),
               ));

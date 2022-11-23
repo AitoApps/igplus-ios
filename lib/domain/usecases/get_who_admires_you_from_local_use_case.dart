@@ -1,7 +1,5 @@
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/likes_and_comments.dart';
-import 'package:igshark/domain/entities/media.dart';
-import 'package:igshark/domain/entities/media_liker.dart';
 import 'package:igshark/domain/repositories/local/local_repository.dart';
 import 'package:dartz/dartz.dart';
 

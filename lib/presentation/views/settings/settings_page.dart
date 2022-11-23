@@ -11,6 +11,7 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isSubscribed = false;
     List<Map> appSettings1 = [
       // {
       //   "title": "Likes this app? Rate us",
@@ -24,6 +25,8 @@ class SettingPage extends StatelessWidget {
       {
         "title": "Report a bug or suggest a feature",
         "context": context,
+        "locked": false,
+        "isSubscribed": isSubscribed,
       }
     ];
 
@@ -31,10 +34,14 @@ class SettingPage extends StatelessWidget {
       {
         "title": "Restore Purchase",
         "context": context,
+        "locked": false,
+        "isSubscribed": isSubscribed,
       },
       {
         "title": "About supscriptions",
         "context": context,
+        "locked": false,
+        "isSubscribed": isSubscribed,
       }
     ];
 
@@ -42,10 +49,14 @@ class SettingPage extends StatelessWidget {
       {
         "title": "Term of Use",
         "context": context,
+        "locked": false,
+        "isSubscribed": isSubscribed,
       },
       {
         "title": "Privacy Policy",
         "context": context,
+        "locked": false,
+        "isSubscribed": isSubscribed,
       }
     ];
     return CupertinoPageScaffold(

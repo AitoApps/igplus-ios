@@ -2,10 +2,13 @@ import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/stories_user.dart';
+import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_stories_users_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_stories_users_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_use_case.dart';
+import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/save_stories_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_stories_user_to_local_use_case.dart';
 
@@ -17,12 +20,16 @@ class UserStoriesCubit extends Cubit<UserStoriesState> {
   final GetStoriesUsersFromLocalUseCase getStoriesUsersFromLocal;
   final CacheStoriesUserToLocalUseCase cacheStoriesUsersToLocal;
   final CacheStoriesToLocalUseCase cacheStoriesToLocal;
+  final GetIgDataUpdateUseCase getIgDataUpdateUseCase;
+  final SaveIgDataUpdateUseCase saveIgDataUpdateUseCase;
   UserStoriesCubit({
     required this.getUserStories,
     required this.getUser,
     required this.getStoriesUsersFromLocal,
     required this.cacheStoriesUsersToLocal,
     required this.cacheStoriesToLocal,
+    required this.getIgDataUpdateUseCase,
+    required this.saveIgDataUpdateUseCase,
   }) : super(UserStoriesInitial());
 
   void init() async {
@@ -37,7 +44,11 @@ class UserStoriesCubit extends Cubit<UserStoriesState> {
 
       // // try to get stories from local
       Either<Failure, List<StoriesUser>?> cachedStoriesUsersList = await getStoriesUsersFromLocal.execute();
-      if (cachedStoriesUsersList.isLeft() || (cachedStoriesUsersList as Right).value == null) {
+
+      // check if StoriesUser is outdated
+      bool isDataOutdated = await checkIfDataOutdated(DataNames.storiesUsers.name);
+
+      if (isDataOutdated || (cachedStoriesUsersList.isLeft() || (cachedStoriesUsersList as Right).value == null)) {
         // get user stories from instagram
         final failureOrUserStories = await getUserStories.execute(igHeaders: currentUser.igHeaders);
         if (failureOrUserStories.isLeft()) {
@@ -62,5 +73,39 @@ class UserStoriesCubit extends Cubit<UserStoriesState> {
         emit(UserStoriesLoaded(userStories: storiesList));
       }
     }
+  }
+
+  Future<bool> checkIfDataOutdated(String dataName) async {
+    IgDataUpdate igDataUpdate;
+    bool isOutdated = false;
+
+    Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
+    if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
+      // if data is not in local, set it as outdated
+      await resetIgDataUpdate(dataName);
+      isOutdated = true;
+    } else {
+      igDataUpdate = (failureOrIgDataUpdate as Right).value!;
+      // check if data is outdated
+      if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
+        await resetIgDataUpdate(dataName);
+        isOutdated = true;
+      } else {
+        isOutdated = false;
+      }
+    }
+
+    return isOutdated;
+  }
+
+  // update IgDataUpdate next update time
+  Future<void> resetIgDataUpdate(String dataName) async {
+    const nextUpdateInMinutes = 60;
+
+    IgDataUpdate igDataUpdate = IgDataUpdate.create(
+      dataName: dataName,
+      nextUpdateInMinutes: nextUpdateInMinutes,
+    );
+    await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
   }
 }

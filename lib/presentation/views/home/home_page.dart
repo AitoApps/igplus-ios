@@ -56,20 +56,20 @@ class _HomePageState extends State<HomePage> {
         body: CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
             backgroundColor: ColorsManager.appBack,
-            leading: (!isSubscribed)
-                ? (subscriptionIsLoading)
-                    ? const AnimatedSwitcher(
-                        duration: Duration(milliseconds: 500),
-                        child: SizedBox(
-                          width: 80.0,
-                          height: 4.0,
-                          child: LinearProgressIndicator(
-                            backgroundColor: ColorsManager.appBack,
-                            valueColor: AlwaysStoppedAnimation<Color>(ColorsManager.cardBack),
-                          ),
-                        ),
-                      )
-                    : GestureDetector(
+            leading: (subscriptionIsLoading)
+                ? const AnimatedSwitcher(
+                    duration: Duration(milliseconds: 500),
+                    child: SizedBox(
+                      width: 80.0,
+                      height: 4.0,
+                      child: LinearProgressIndicator(
+                        backgroundColor: ColorsManager.appBack,
+                        valueColor: AlwaysStoppedAnimation<Color>(ColorsManager.cardBack),
+                      ),
+                    ),
+                  )
+                : (!isSubscribed)
+                    ? GestureDetector(
                         onTap: () async {
                           // open paywall
                           GoRouter.of(context).goNamed('paywall');
@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       )
-                : const SizedBox(),
+                    : const SizedBox(),
             middle: BlocBuilder<ReportCubit, ReportState>(
               builder: (context, state) {
                 if (state is ReportSuccess || state is ReportAccountInfoLoaded) {
@@ -185,6 +185,7 @@ class _HomePageState extends State<HomePage> {
                             GoRouter.of(context).goNamed('instagram_login', queryParams: {
                               'updateInstagramAccount': 'true',
                             });
+                            context.read<ReportCubit>().init();
                           } else {
                             context.read<ReportCubit>().init();
                           }
