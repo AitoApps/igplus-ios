@@ -28,7 +28,7 @@ class TermsOfUse extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 h1Title("Terms of Use"),
-                subTitle("Last updated: 2021-08-01"),
+                subTitle("Last updated: 2022-11-22"),
                 const SizedBox(height: 20.0),
                 h2Title("TERMS OF USE"),
                 const SizedBox(height: 4.0),

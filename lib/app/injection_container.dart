@@ -175,7 +175,10 @@ Future<void> init() async {
   sl.registerFactory(() => SubscriptionCubit());
   sl.registerFactory(() => PaywallCubit(getAccountInfoFromLocalUseCase: sl()));
   sl.registerFactory(() => EngagementCubit());
-  sl.registerFactory(() => SettingsCubit(getAccountInfoFromLocalUseCase: sl()));
+  sl.registerFactory(() => SettingsCubit(
+        getAccountInfoFromLocalUseCase: sl(),
+        clearAllBoxesUseCase: sl(),
+      ));
 
   sl.registerFactory(() => StoryDownloadCubit());
 

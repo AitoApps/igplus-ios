@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:igshark/app/bloc/app_bloc.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
+import 'package:igshark/presentation/views/global/logout_alert.dart';
 
 class ProfileManager extends StatelessWidget {
   final String username;
@@ -87,42 +86,6 @@ class ProfileManager extends StatelessWidget {
           )
         ],
       ),
-    );
-  }
-
-  logoutAlert(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: const Text("Cancel"),
-      onPressed: () {
-        Navigator.of(context, rootNavigator: true).pop();
-      },
-    );
-    Widget continueButton = TextButton(
-      child: const Text("Logout"),
-      onPressed: () {
-        context.read<AppBloc>().add(AppLogoutRequested());
-        Navigator.of(context, rootNavigator: true).pop();
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      backgroundColor: ColorsManager.cardBack,
-      title: const Text("Are you sure you want to log out?"),
-      content: const Text("When you log out, all your data will be deleted permanently."),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
     );
   }
 

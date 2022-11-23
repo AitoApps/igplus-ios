@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/presentation/blocs/settings/cubit/settings_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
-import 'package:igshark/presentation/views/global/circular_cached_image.dart';
+import 'package:igshark/presentation/resources/theme_manager.dart';
 import 'package:igshark/presentation/views/global/info_card_list.dart';
+import 'package:igshark/presentation/views/global/logout_alert.dart';
 import 'package:igshark/presentation/views/global/section_title.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -17,33 +18,41 @@ class SettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isSubscribed = false;
     List<Map> appSettings1 = [
-      // {
-      //   "title": "Likes this app? Rate us",
-      //   "context": context,
-      // },
-      // {
-      //   "title": "Reset App Data",
-      //   "subTitle": "This will reset all the data stored in the app",
-      //   "context": context,
-      // },
+      {
+        "title": "Likes this app? Rate us",
+        "context": context,
+        "type": "rateUs",
+        "locked": false,
+        "isSubscribed": isSubscribed,
+      },
       {
         "title": "Report a bug or suggest a feature",
         "context": context,
+        "type": "mailto",
         "locked": false,
         "isSubscribed": isSubscribed,
-      }
+      },
+      {
+        "title": "Reset App Data",
+        "context": context,
+        "type": "resetAppData",
+        "locked": false,
+        "isSubscribed": isSubscribed,
+      },
     ];
 
     List<Map> appSettings2 = [
       {
         "title": "Restore Purchase",
         "context": context,
+        "type": "restorePurchase",
         "locked": false,
         "isSubscribed": isSubscribed,
       },
       {
         "title": "About supscriptions",
         "context": context,
+        "type": "aboutSubscriptions",
         "locked": false,
         "isSubscribed": isSubscribed,
       }
@@ -53,26 +62,33 @@ class SettingPage extends StatelessWidget {
       {
         "title": "Term of Use",
         "context": context,
+        "type": "termOfUse",
         "locked": false,
         "isSubscribed": isSubscribed,
       },
       {
         "title": "Privacy Policy",
         "context": context,
+        "type": "privacyPolicy",
         "locked": false,
         "isSubscribed": isSubscribed,
       }
     ];
-    return CupertinoPageScaffold(
-      child: CupertinoScrollbar(
-        thickness: 0,
-        child: BlocConsumer<SettingsCubit, SettingsState>(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: appMaterialTheme(),
+      home: Scaffold(
+        body: BlocConsumer<SettingsCubit, SettingsState>(
           listener: (context, state) {
             if (state is SettingsLoaded) {
               if (state.message != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(state.message!),
+                    backgroundColor: ColorsManager.cardBack,
+                    content: Text(
+                      state.message!,
+                      style: const TextStyle(color: ColorsManager.secondarytextColor),
+                    ),
                   ),
                 );
               }
@@ -85,9 +101,9 @@ class SettingPage extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ListView(
+                  padding: const EdgeInsets.all(0),
                   children: <Widget>[
                     Container(
-                      color: ColorsManager.cardBack,
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -96,25 +112,50 @@ class SettingPage extends StatelessWidget {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(
-                                margin: const EdgeInsets.only(right: 10.0),
-                                alignment: Alignment.centerLeft,
-                                width: 90.0,
-                                height: 90.0,
-                                decoration: BoxDecoration(
-                                  border: Border.fromBorderSide(BorderSide(
-                                      color: (isSubscribed)
-                                          ? const Color.fromARGB(255, 212, 148, 10)
-                                          : const Color.fromARGB(255, 211, 211, 211),
-                                      width: 2)),
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: NetworkImage(accountInfo.picture),
+                              Stack(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.all(10),
+                                    alignment: Alignment.centerLeft,
+                                    width: 80.0,
+                                    height: 80.0,
+                                    decoration: BoxDecoration(
+                                      border: Border.fromBorderSide(BorderSide(
+                                          color: (isSubscribed)
+                                              ? Color.fromARGB(255, 212, 148, 10)
+                                              : Color.fromARGB(255, 211, 211, 211),
+                                          width: 2)),
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        fit: BoxFit.fill,
+                                        image: NetworkImage(accountInfo.picture),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  if (isSubscribed)
+                                    Positioned(
+                                      bottom: 15,
+                                      right: 15,
+                                      child: Shimmer.fromColors(
+                                          baseColor: const Color.fromARGB(255, 212, 148, 10),
+                                          highlightColor: const Color.fromARGB(255, 251, 255, 36),
+                                          child: const Icon(
+                                            FontAwesomeIcons.crown,
+                                            color: Color.fromARGB(255, 212, 148, 10),
+                                            size: 18,
+                                            shadows: [
+                                              Shadow(
+                                                blurRadius: 4.0,
+                                                color: Colors.black,
+                                                offset: Offset(0.0, 0.0),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                ],
                               ),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "@${accountInfo.username}",
@@ -123,18 +164,47 @@ class SettingPage extends StatelessWidget {
                                       fontSize: 20.0,
                                       fontFamily: "Abel",
                                       fontStyle: FontStyle.normal,
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 5.0),
-                                  Text(
-                                    "ID: ${accountInfo.igUserId}",
-                                    style: const TextStyle(
-                                      color: ColorsManager.secondarytextColor,
-                                      fontSize: 16.0,
-                                      fontFamily: "Abel",
-                                      fontStyle: FontStyle.normal,
-                                    ),
+                                  const SizedBox(height: 8.0),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        FontAwesomeIcons.star,
+                                        color: ColorsManager.secondarytextColor,
+                                        size: 12.0,
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        (isSubscribed) ? "Premium account" : "Free account",
+                                        style: const TextStyle(
+                                          color: ColorsManager.secondarytextColor,
+                                          fontSize: 12.0,
+                                          fontFamily: "Abel",
+                                          fontStyle: FontStyle.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        FontAwesomeIcons.idCard,
+                                        color: ColorsManager.secondarytextColor,
+                                        size: 12.0,
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        accountInfo.igUserId,
+                                        style: const TextStyle(
+                                          color: ColorsManager.secondarytextColor,
+                                          fontSize: 12.0,
+                                          fontFamily: "Abel",
+                                          fontStyle: FontStyle.normal,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -143,9 +213,7 @@ class SettingPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: GestureDetector(
-                              onTap: () {
-                                GoRouter.of(context).pushNamed('instagram_login');
-                              },
+                              onTap: () => logoutAlert(context),
                               child: const Icon(
                                 FontAwesomeIcons.rightFromBracket,
                                 color: ColorsManager.textColor,
@@ -157,6 +225,7 @@ class SettingPage extends StatelessWidget {
                       ),
                     ),
                     const Divider(
+                      height: 8.0,
                       color: ColorsManager.cardBack,
                       thickness: 1.0,
                     ),

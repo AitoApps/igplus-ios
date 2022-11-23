@@ -12,6 +12,7 @@ import 'package:igshark/presentation/views/insight/stories/stories_viewers_insig
 import 'package:igshark/presentation/views/login/instagram_login_page.dart';
 import 'package:igshark/presentation/views/login/login_page.dart';
 import 'package:igshark/presentation/views/insight/media/media_list/media_list.dart';
+import 'package:igshark/presentation/views/paywall/about_subscriptions.dart';
 import 'package:igshark/presentation/views/paywall/paywall.dart';
 import 'package:igshark/presentation/views/paywall/privacy_policy.dart';
 import 'package:igshark/presentation/views/paywall/terms_of_us.dart';
@@ -113,12 +114,40 @@ GoRouter routes(AppBloc appBloc) {
                       return const TermsOfUse();
                     },
                   ),
+                  GoRoute(
+                    name: 'aboutSub',
+                    path: 'aboutSub',
+                    builder: (context, state) {
+                      return const AboutSubscriptions();
+                    },
+                  ),
                 ]),
             GoRoute(
               name: 'thankyoupage',
               path: 'thankyoupage',
               builder: (context, state) {
                 return const ThankYouPage();
+              },
+            ),
+            GoRoute(
+              name: 'privacyPolicy',
+              path: 'privacyPolicy',
+              builder: (context, state) {
+                return const PrivacyPolicy();
+              },
+            ),
+            GoRoute(
+              name: 'termOfUse',
+              path: 'termOfUse',
+              builder: (context, state) {
+                return const TermsOfUse();
+              },
+            ),
+            GoRoute(
+              name: 'aboutSubscriptions',
+              path: 'aboutSubscriptions',
+              builder: (context, state) {
+                return const AboutSubscriptions();
               },
             ),
           ]),

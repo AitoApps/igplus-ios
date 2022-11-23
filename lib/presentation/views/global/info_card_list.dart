@@ -1,11 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:igshark/app/extensions/media_query_values.dart';
 import 'package:igshark/presentation/blocs/insight/media_insight/cubit/media_list_cubit.dart';
+import 'package:igshark/presentation/blocs/settings/cubit/settings_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/views/global/loading_indicator.dart';
+import 'package:igshark/presentation/views/global/mailto.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoCardList extends StatelessWidget {
   final List<Map> cards;
@@ -46,10 +52,36 @@ class InfoCardList extends StatelessWidget {
       builder: (context, state) {
         if (parentPage == "settings" || state is MediaListSuccess) {
           return GestureDetector(
-            onTap: () {
-              if (parentPage == "settings") {
-              } else if (locked && !isSubscribed) {
+            onTap: () async {
+              // locked cards
+              if (locked && !isSubscribed) {
                 GoRouter.of(context).pushNamed('paywall');
+              }
+              // setting links
+              else if (type == "rateUs") {
+                String appId = Platform.isIOS ? "id1520000000" : "com.igshark.app";
+                await _openAppStore(appId);
+              } else if (type == "mailto") {
+                _sendMail(context);
+              } else if (type == "resetAppData") {
+                await _resetDataAlert(context);
+              } else if (type == "restorePurchase") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    backgroundColor: ColorsManager.cardBack,
+                    content: Text(
+                      "Trying to restore purchases...",
+                      style: TextStyle(color: ColorsManager.secondarytextColor),
+                    ),
+                  ),
+                );
+                await BlocProvider.of<SettingsCubit>(context).restorePurchases();
+              } else if (type == "aboutSubscriptions") {
+                GoRouter.of(context).goNamed("aboutSubscriptions");
+              } else if (type == "termOfUse") {
+                GoRouter.of(context).goNamed("termOfUse");
+              } else if (type == "privacyPolicy") {
+                GoRouter.of(context).goNamed('privacyPolicy');
               }
               // likers and commenters
               else if (type == "mostLikes" ||
@@ -62,7 +94,6 @@ class InfoCardList extends StatelessWidget {
                   type == "noLikesOrComments") {
                 GoRouter.of(context).go('/home/engagement/$type');
               } else
-
               // Stories
               if (type == "mostViewedStories") {
                 return GoRouter.of(context).go('/home/storiesList/$type');
@@ -78,7 +109,8 @@ class InfoCardList extends StatelessWidget {
                   type == "mostViewedMedia") {
                 GoRouter.of(context).go('/home/mediaList/$type');
               } else {
-                GoRouter.of(context).go('/home/mediaList/$type');
+                // alert no page
+
               }
             },
             child: Card(
@@ -179,6 +211,98 @@ class InfoCardList extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _openAppStore(String appId) async {
+    // appstore
+    if (Platform.isIOS) {
+      Uri uri = Uri.parse("itms-apps://itunes.apple.com/app/$appId");
+      try {
+        var rs = await launchUrl(
+          uri,
+        );
+        if (rs == false) {
+          var url = 'https://itunes.apple.com/app/$appId';
+          Uri uri = Uri.parse(url);
+          await launchUrl(
+            uri,
+          );
+        }
+      } catch (e) {
+        throw 'There was a problem to open the url: https://itunes.apple.com/app/$appId';
+      }
+    } else if (Platform.isAndroid) {
+      Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=$appId");
+      try {
+        var rs = await launchUrl(
+          uri,
+        );
+        if (rs == false) {
+          var url = 'https://play.google.com/store/apps/details?id=$appId';
+          Uri uri = Uri.parse(url);
+          await launchUrl(
+            uri,
+          );
+        }
+      } catch (e) {
+        throw 'There was a problem to open the url: https://play.google.com/store/apps/details?id=$appId';
+      }
+    }
+  }
+
+  void _sendMail(context) async {
+    final url = Mailto(
+      to: [
+        'contact@igshark.app',
+      ],
+      cc: [],
+      bcc: [],
+      subject: 'Report a bug or suggest a feature',
+      body: '',
+    );
+    try {
+      Uri uri = Uri.parse(url.toString());
+      await launchUrl(uri);
+    } catch (e) {
+      throw 'There was a problem to open the url: $url';
+    }
+  }
+
+  Future<void> _resetDataAlert(context) async {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text("Cancel", style: TextStyle(color: ColorsManager.primaryColor)),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text("Reset data", style: TextStyle(color: ColorsManager.primaryColor)),
+      onPressed: () async {
+        await BlocProvider.of<SettingsCubit>(context).resetData();
+        Navigator.of(context, rootNavigator: true).pop();
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      backgroundColor: ColorsManager.cardBack,
+      title: const Text("Are you sure you want to reset data?", style: TextStyle(color: ColorsManager.textColor)),
+      content: const Text("When you reset data, all your data will be deleted permanently.",
+          style: TextStyle(color: ColorsManager.textColor)),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

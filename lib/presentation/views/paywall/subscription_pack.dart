@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:shimmer/shimmer.dart';
 
-class SubscriptionPack extends StatefulWidget {
+class SubscriptionPack extends StatelessWidget {
   const SubscriptionPack({
     Key? key,
     required this.title,
@@ -21,18 +21,12 @@ class SubscriptionPack extends StatefulWidget {
   final bool mostPopular;
 
   @override
-  State<SubscriptionPack> createState() => _SubscriptionPackState();
-}
-
-class _SubscriptionPackState extends State<SubscriptionPack> {
-  bool? selected;
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.selected == widget.productId) {
-      selected = true;
+    late bool isSelected;
+    if (selected == productId) {
+      isSelected = true;
     } else {
-      selected = false;
+      isSelected = false;
     }
     return Center(
       child: Column(
@@ -44,7 +38,7 @@ class _SubscriptionPackState extends State<SubscriptionPack> {
               margin: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 border: Border.all(
-                    color: (selected!) ? ColorsManager.primaryColor : ColorsManager.primaryColor.withOpacity(0.3),
+                    color: (isSelected) ? ColorsManager.primaryColor : ColorsManager.primaryColor.withOpacity(0.3),
                     width: 2.0),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -54,7 +48,7 @@ class _SubscriptionPackState extends State<SubscriptionPack> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.title,
+                      Text(title,
                           style: const TextStyle(
                             color: ColorsManager.textColor,
                             fontSize: 24.0,
@@ -62,7 +56,7 @@ class _SubscriptionPackState extends State<SubscriptionPack> {
                             fontStyle: FontStyle.normal,
                           ),
                           textAlign: TextAlign.left),
-                      Text(widget.saveText,
+                      Text(saveText,
                           style: const TextStyle(
                             color: ColorsManager.secondarytextColor,
                             fontSize: 16.0,
@@ -72,7 +66,7 @@ class _SubscriptionPackState extends State<SubscriptionPack> {
                           textAlign: TextAlign.left),
                     ],
                   ),
-                  Text(widget.monthlyPrice,
+                  Text(monthlyPrice,
                       style: const TextStyle(
                         color: ColorsManager.primaryColor,
                         fontSize: 18.0,
@@ -84,7 +78,7 @@ class _SubscriptionPackState extends State<SubscriptionPack> {
                 ],
               ),
             ),
-            (widget.mostPopular == true)
+            (mostPopular == true)
                 ? const Positioned(
                     right: 20,
                     top: 15,

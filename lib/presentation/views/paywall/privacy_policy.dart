@@ -28,7 +28,7 @@ class PrivacyPolicy extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 h1Title("Privacy Policy"),
-                subTitle("Last updated: 2021-08-01"),
+                subTitle("Last updated: 2022-11-22"),
                 const SizedBox(height: 20.0),
                 h2Title("PRIVACY POLICY"),
                 const SizedBox(height: 4.0),
