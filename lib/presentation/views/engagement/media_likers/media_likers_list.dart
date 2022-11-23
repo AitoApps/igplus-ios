@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/media_liker.dart';
 import 'package:igshark/domain/entities/media_likers.dart';
+import 'package:igshark/presentation/blocs/engagement/cubit/engagement_cubit.dart';
 import 'package:igshark/presentation/blocs/engagement/media_likers/cubit/media_likers_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/resources/theme_manager.dart';
@@ -144,7 +145,12 @@ class _MediaLikersListState extends State<MediaLikersList> {
         theme: appMaterialTheme(),
         home: Scaffold(
           backgroundColor: ColorsManager.appBack,
-          body: BlocBuilder<MediaLikersCubit, MediaLikersState>(
+          body: BlocConsumer<MediaLikersCubit, MediaLikersState>(
+            listener: (context, state) {
+              if (state is MediaLikersLoading) {
+                BlocProvider.of<EngagementCubit>(context).emit(EngagementLoading());
+              }
+            },
             builder: (context, state) {
               return (_showSearchForm)
                   ? CustomScrollView(

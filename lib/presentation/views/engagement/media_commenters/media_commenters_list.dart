@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/media_commenter.dart';
 import 'package:igshark/domain/entities/media_commenters.dart';
+import 'package:igshark/presentation/blocs/engagement/cubit/engagement_cubit.dart';
 import 'package:igshark/presentation/blocs/engagement/media_commeters/cubit/media_commenters_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/resources/theme_manager.dart';
@@ -147,7 +148,12 @@ class _MediaCommentersListState extends State<MediaCommentersList> {
         theme: appMaterialTheme(),
         home: Scaffold(
           backgroundColor: ColorsManager.appBack,
-          body: BlocBuilder<MediaCommentersCubit, MediaCommentersState>(
+          body: BlocConsumer<MediaCommentersCubit, MediaCommentersState>(
+            listener: (context, state) {
+              if (state is MediaCommentersLoading) {
+                BlocProvider.of<EngagementCubit>(context).emit(EngagementLoading());
+              }
+            },
             builder: (context, state) {
               return (_showSearchForm)
                   ? CustomScrollView(

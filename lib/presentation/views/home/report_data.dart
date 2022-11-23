@@ -197,7 +197,7 @@ class ReportData extends StatelessWidget {
                   ),
                 ),
               )
-            : (errorMessage != "")
+            : (errorMessage != null && errorMessage != "")
                 ? errorMessageWidget(context, errorMessage)
                 : const SizedBox.shrink(),
       ]),

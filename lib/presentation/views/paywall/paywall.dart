@@ -147,7 +147,7 @@ class _PaywallState extends State<Paywall> {
                                 getCurrency(packages.first.storeProduct.priceString, packages.first.storeProduct.price);
 
                             int counter = 0;
-                            selected = packages[1].storeProduct.identifier;
+                            selected ??= packages[1].storeProduct.identifier;
                             for (var package in packages) {
                               counter++;
                               final product = package.storeProduct;
@@ -262,6 +262,30 @@ class _PaywallState extends State<Paywall> {
                               padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
                               child: Text(
                                 "Privacy Policy",
+                                style: TextStyle(
+                                  color: ColorsManager.secondarytextColor,
+                                  fontSize: 14.0,
+                                  fontFamily: 'Abel',
+                                  fontStyle: FontStyle.normal,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                          const Divider(
+                            color: ColorsManager.secondarytextColor,
+                            thickness: 2,
+                            indent: 10,
+                            endIndent: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              GoRouter.of(context).goNamed('aboutSub');
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+                              child: Text(
+                                "About subscriptions",
                                 style: TextStyle(
                                   color: ColorsManager.secondarytextColor,
                                   fontSize: 14.0,

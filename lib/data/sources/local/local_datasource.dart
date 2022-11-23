@@ -634,5 +634,6 @@ class LocalDataSourceImp extends LocalDataSource {
     await Hive.box<MediaLiker>(MediaLiker.boxKey).clear();
     await Hive.box<MediaCommenter>(MediaCommenter.boxKey).clear();
     await Hive.box<LikesAndComments>(LikesAndComments.boxKey).clear();
+    await Hive.box<IgDataUpdate>(IgDataUpdate.boxKey).clear();
   }
 }

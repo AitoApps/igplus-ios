@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/account_info.dart';
+import 'package:igshark/domain/usecases/clear_local_data_use_case.dart';
 import 'package:igshark/domain/usecases/get_account_info_from_local_use_case.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -10,7 +11,11 @@ part 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
   final GetAccountInfoFromLocalUseCase getAccountInfoFromLocalUseCase;
-  SettingsCubit({required this.getAccountInfoFromLocalUseCase}) : super(SettingsInitial()) {
+  final ClearAllBoxesUseCase clearAllBoxesUseCase;
+  SettingsCubit({
+    required this.getAccountInfoFromLocalUseCase,
+    required this.clearAllBoxesUseCase,
+  }) : super(SettingsInitial()) {
     initSettings();
   }
 
@@ -71,6 +76,31 @@ class SettingsCubit extends Cubit<SettingsState> {
         // emit(SubscriptionLoaded(subscriptionPack));
       } catch (e) {
         String message = 'Error occured wail trying to restored your purchase. try again later.';
+        emit(SettingsLoaded(
+          accountInfo: accountInfo,
+          isSubscribed: isSubscribed,
+          message: message,
+        ));
+      }
+    } else {
+      emit(const SettingsFailure(message: 'Error while loading settings'));
+    }
+  }
+
+  // reset data
+  Future<void> resetData() async {
+    AccountInfo? accountInfo = getAccountInfoFromLocal();
+    if (accountInfo != null) {
+      try {
+        await clearAllBoxesUseCase.execute();
+        String message = 'Your data was successfuly reseted.';
+        emit(SettingsLoaded(
+          accountInfo: accountInfo,
+          isSubscribed: isSubscribed,
+          message: message,
+        ));
+      } catch (e) {
+        String message = 'Error occured wail trying to reset your data. try again later.';
         emit(SettingsLoaded(
           accountInfo: accountInfo,
           isSubscribed: isSubscribed,
