@@ -22,6 +22,7 @@ import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit
 import 'package:igshark/presentation/blocs/home/report/cubit/report_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/cubit/stories_insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/cubit/story_viewers_cubit.dart';
+import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/story_download/cubit/story_download_cubit.dart';
 import 'package:igshark/presentation/blocs/login/cubit/instagram_auth_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/media_insight/cubit/media_list_cubit.dart';
 import 'package:igshark/presentation/blocs/home/stories/cubit/stories_cubit.dart';
@@ -112,6 +113,7 @@ void main() async {
         BlocProvider<SubscriptionCubit>(create: (_) => di.sl<SubscriptionCubit>()),
         BlocProvider<PaywallCubit>(create: (_) => di.sl<PaywallCubit>()),
         BlocProvider<AppBloc>(create: (_) => di.sl<AppBloc>()),
+        BlocProvider<StoryDownloadCubit>(create: (_) => di.sl<StoryDownloadCubit>()),
       ],
       child: const App(),
     ),

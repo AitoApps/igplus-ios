@@ -30,3 +30,21 @@ class StoriesFailure extends StoriesState {
   @override
   List<Object> get props => [failure];
 }
+
+class StoriesDownloading extends StoriesState {
+  final Story story;
+
+  const StoriesDownloading({required this.story});
+
+  @override
+  List<Object> get props => [story];
+}
+
+class StoriesDownloaded extends StoriesState {
+  final Story story;
+
+  const StoriesDownloaded({required this.story});
+
+  @override
+  List<Object> get props => [story];
+}

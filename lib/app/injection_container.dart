@@ -49,6 +49,7 @@ import 'package:igshark/presentation/blocs/home/stories/cubit/stories_cubit.dart
 import 'package:igshark/presentation/blocs/home/user_stories/cubit/user_stories_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/cubit/stories_insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/cubit/story_viewers_cubit.dart';
+import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/story_download/cubit/story_download_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/cubit/paywall_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/subscription/cubit/subscription_cubit.dart';
 import '../data/models/story_model.dart';
@@ -153,6 +154,8 @@ Future<void> init() async {
       ));
   sl.registerFactory(() => SubscriptionCubit());
   sl.registerFactory(() => PaywallCubit(getAccountInfoFromLocalUseCase: sl()));
+
+  sl.registerFactory(() => StoryDownloadCubit());
 
   // Use cases
   sl.registerLazySingleton(() => GetAccountInfoUseCase(instagramRepository: sl()));
