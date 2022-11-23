@@ -53,8 +53,11 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
     // check if madiaCommenters data is outdated
     bool isDataOutdated = await checkIfDataOutdated(DataNames.mediaCommenters.name);
 
-    if (isDataOutdated) {
-// get media list from local
+    // get media commenters from local
+    mediaCommentersList = _getMediaCommentersFromLocal(pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+    if (mediaCommentersList.isEmpty || isDataOutdated) {
+      // get media list from local
       Either<Failure, List<Media>?>? mediaListOrFailure =
           await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
 
@@ -70,6 +73,8 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
             // save media commenters to local
             await cacheMediaCommentersToLocalUseCase.execute(
                 boxKey: MediaCommenter.boxKey, mediaCommentersList: mediaCommenters);
+            // reset IgDataUpdate
+            await resetIgDataUpdate(DataNames.mediaCommenters.name);
           }
 
           await Future.delayed(const Duration(seconds: 2));
@@ -77,43 +82,8 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
         emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
         return mediaCommentersList;
       }
-    } else {
-      // get media commenters from local
-      final mediaCommentersFromLocal = getMediaCommentersFromLocalUseCase.execute(
-          boxKey: MediaCommenter.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
-
-      if (mediaCommentersFromLocal.isRight() && mediaCommentersFromLocal.getOrElse(() => null) != null) {
-        mediaCommentersList = mediaCommentersFromLocal.getOrElse(() => null)!;
-        emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
-        return mediaCommentersList;
-      }
-
-      if (mediaCommentersList.isEmpty) {
-        // get media list from local
-        Either<Failure, List<Media>?>? mediaListOrFailure =
-            await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
-
-        if (mediaListOrFailure != null && mediaListOrFailure.isRight()) {
-          mediaList = mediaListOrFailure.getOrElse(() => null) ?? [];
-
-          for (var media in mediaList) {
-            // get media commenters from instagram
-            List<MediaCommenter>? mediaCommenters =
-                await getMediaCommenters(mediaId: media.id, boxKey: MediaCommenter.boxKey);
-            if (mediaCommenters != null) {
-              mediaCommentersList.addAll(mediaCommenters);
-              // save media commenters to local
-              await cacheMediaCommentersToLocalUseCase.execute(
-                  boxKey: MediaCommenter.boxKey, mediaCommentersList: mediaCommenters);
-            }
-
-            await Future.delayed(const Duration(seconds: 2));
-          }
-          emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
-          return mediaCommentersList;
-        }
-      }
     }
+
     return null;
   }
 
@@ -298,13 +268,11 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
     Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
     if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
       // if data is not in local, set it as outdated
-      await resetIgDataUpdate(dataName);
       isOutdated = true;
     } else {
       igDataUpdate = (failureOrIgDataUpdate as Right).value!;
       // check if data is outdated
       if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
-        await resetIgDataUpdate(dataName);
         isOutdated = true;
       } else {
         isOutdated = false;
@@ -323,5 +291,18 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
       nextUpdateInMinutes: nextUpdateInMinutes,
     );
     await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
+  }
+
+  List<MediaCommenter> _getMediaCommentersFromLocal({pageKey, pageSize, searchTerm}) {
+    List<MediaCommenter> mediaCommentersList = [];
+    final mediaCommentersFromLocal = getMediaCommentersFromLocalUseCase.execute(
+        boxKey: MediaCommenter.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+    if (mediaCommentersFromLocal.isRight() && mediaCommentersFromLocal.getOrElse(() => null) != null) {
+      mediaCommentersList = mediaCommentersFromLocal.getOrElse(() => null)!;
+      emit(MediaCommentersSuccess(mediaCommenters: mediaCommentersList, pageKey: 0));
+      return mediaCommentersList;
+    }
+    return [];
   }
 }

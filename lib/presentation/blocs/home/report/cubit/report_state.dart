@@ -20,9 +20,11 @@ class ReportInProgress extends ReportState {
 class ReportSuccess extends ReportState {
   final Report report;
   final AccountInfo accountInfo;
-  const ReportSuccess({required this.report, required this.accountInfo});
+  final String? errorMessage;
+  const ReportSuccess({required this.report, required this.accountInfo, this.errorMessage});
+
   @override
-  List<Object> get props => [report, accountInfo];
+  List<Object> get props => [report, accountInfo, errorMessage ?? ""];
 }
 
 class ReportAccountChanged extends ReportState {}

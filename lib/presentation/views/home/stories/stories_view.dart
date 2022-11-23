@@ -164,7 +164,11 @@ Widget _buildProfileView({required StoryOwner storyOwner, required int takenAt, 
               children: [
                 const Icon(FontAwesomeIcons.angleLeft, color: Colors.white, size: 16),
                 const SizedBox(width: 6.0),
-                CircularCachedImage(picture: storyOwner.profilePicUrl, username: storyOwner.username),
+                CircularCachedImage(
+                  picture: storyOwner.profilePicUrl,
+                  username: storyOwner.username,
+                  itemRadius: 40.0,
+                ),
               ],
             ),
             const SizedBox(width: 8.0),

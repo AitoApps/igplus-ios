@@ -1,13 +1,17 @@
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+import 'package:igshark/data/failure.dart';
 import 'package:igshark/data/models/stories_viewer_model.dart';
+import 'package:igshark/domain/entities/ig_data_update.dart';
 import 'package:igshark/domain/entities/stories_viewers.dart';
 import 'package:igshark/domain/entities/story_viewer.dart';
 import 'package:igshark/domain/usecases/follow_user_use_case.dart';
+import 'package:igshark/domain/usecases/get_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/get_story_viewers_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_story_viewers_use_case.dart';
 import 'package:igshark/domain/usecases/get_user_use_case.dart';
+import 'package:igshark/domain/usecases/save_ig_data_update_use_case.dart';
 import 'package:igshark/domain/usecases/save_story_viewers_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/unfollow_user_use_case%20copy.dart';
 
@@ -20,6 +24,8 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
   final UnfollowUserUseCase unfollowUserUseCase;
   final CacheStoryViewersToLocalUseCase cacheStoryViewersToLocalUseCase;
   final GetUserUseCase getUser;
+  final GetIgDataUpdateUseCase getIgDataUpdateUseCase;
+  final SaveIgDataUpdateUseCase saveIgDataUpdateUseCase;
   StoryViewersCubit({
     required this.getStoryViewersFromLocal,
     required this.getStoryViewers,
@@ -27,6 +33,8 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
     required this.getUser,
     required this.unfollowUserUseCase,
     required this.cacheStoryViewersToLocalUseCase,
+    required this.getIgDataUpdateUseCase,
+    required this.saveIgDataUpdateUseCase,
   }) : super(StoryViewersInitial());
 
   Future<List<StoryViewer>?> getStoryViewersList({
@@ -36,30 +44,31 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
     int? pageSize,
     String? searchTerm,
   }) async {
-    List<StoryViewer>? storyViewersList;
-    storyViewersList = await _getStoryViewersListFromLocal(
-      mediaId: mediaId,
-      type: type,
-      pageKey: pageKey,
-      pageSize: pageSize,
-      searchTerm: searchTerm,
-    );
+    List<StoryViewer> storyViewersList;
 
-    if (storyViewersList != null) {
-      emit(StoryViewersSuccess(storyViewersList: storyViewersList, pageKey: pageKey));
-      return storyViewersList;
-    } else {
+    storyViewersList = await _getStoryViewersListFromLocal(
+        mediaId: mediaId, type: type, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+    // check if stories list is outdated
+    bool isDataOutdated = await checkIfDataOutdated(DataNames.storyViwers.name);
+
+    if (storyViewersList.isEmpty || isDataOutdated) {
       storyViewersList = await getStoryViewersListFromInstagram(mediaId: mediaId);
       // save story viewers list to local
-      if (storyViewersList != null) {
+      if (storyViewersList.isNotEmpty) {
         await cacheStoryViewersToLocalUseCase.execute(storiesViewersList: storyViewersList, boxKey: StoryViewer.boxKey);
+        // reset IgDataUpdate
+        await resetIgDataUpdate(DataNames.storyViwers.name);
       }
+      return storyViewersList;
+    } else {
+      emit(StoryViewersSuccess(storyViewersList: storyViewersList, pageKey: pageKey));
       return storyViewersList;
     }
   }
 
   // get story viewers list from local
-  Future<List<StoryViewer>?> _getStoryViewersListFromLocal({
+  Future<List<StoryViewer>> _getStoryViewersListFromLocal({
     required String mediaId,
     required String type,
     int? pageKey,
@@ -80,25 +89,25 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
     );
 
     if (failureOrStoryViewersList.isLeft()) {
-      return null;
+      return [];
     } else {
       return (failureOrStoryViewersList as Right).value;
     }
   }
 
   // get story viewers list from instagram
-  Future<List<StoryViewer>?> getStoryViewersListFromInstagram({required String mediaId}) async {
+  Future<List<StoryViewer>> getStoryViewersListFromInstagram({required String mediaId}) async {
     emit(StoryViewersLoading());
     // get header
     final failureOrCurrentUser = await getUser.execute();
     if (failureOrCurrentUser.isLeft()) {
-      return null;
+      return [];
     }
     final currentUser = (failureOrCurrentUser as Right).value;
     // get story viewers list
     final failureOrStoryViewersList = await getStoryViewers.execute(mediaId: mediaId, igHeaders: currentUser.igHeaders);
     if (failureOrStoryViewersList.isLeft()) {
-      return null;
+      return [];
     } else {
       // return viewers list
       return (failureOrStoryViewersList as Right).value;
@@ -240,5 +249,37 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
 
       return storiesTopViewersList;
     }
+  }
+
+  Future<bool> checkIfDataOutdated(String dataName) async {
+    IgDataUpdate igDataUpdate;
+    bool isOutdated = false;
+
+    Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
+    if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
+      // if data is not in local, set it as outdated
+      isOutdated = true;
+    } else {
+      igDataUpdate = (failureOrIgDataUpdate as Right).value!;
+      // check if data is outdated
+      if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
+        isOutdated = true;
+      } else {
+        isOutdated = false;
+      }
+    }
+
+    return isOutdated;
+  }
+
+  // update IgDataUpdate next update time
+  Future<void> resetIgDataUpdate(String dataName) async {
+    const nextUpdateInMinutes = 60 * 1;
+
+    IgDataUpdate igDataUpdate = IgDataUpdate.create(
+      dataName: dataName,
+      nextUpdateInMinutes: nextUpdateInMinutes,
+    );
+    await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
   }
 }

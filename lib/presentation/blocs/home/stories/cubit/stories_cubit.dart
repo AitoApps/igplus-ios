@@ -62,7 +62,7 @@ class StoriesCubit extends Cubit<StoriesState> {
       // check if StoriesUser is outdated
       bool isDataOutdated = await checkIfDataOutdated(DataNames.stories.name);
 
-      if (isDataOutdated || (cachedStoriesList.isLeft() || (cachedStoriesList as Right).value == null)) {
+      if (isDataOutdated || cachedStoriesList.isLeft() || (cachedStoriesList as Right).value == null) {
         // get stories user
         final failureOrStories =
             await getStories.execute(storyOwnerId: storyOwner.id, igHeaders: currentUser.igHeaders);
@@ -79,6 +79,8 @@ class StoriesCubit extends Cubit<StoriesState> {
               boxKey: StoriesUser.boxKey, storiesList: (failureOrStories as Right).value!, ownerId: storyOwner.id);
           final List<Story> stories = (failureOrStories as Right).value;
           emit(StoriesLoaded(stories: stories, controller: controller, storyOwner: storyOwner));
+          // reset IgDataUpdate
+          await resetIgDataUpdate(DataNames.stories.name);
         }
       } else {
         final List<Story> stories = (cachedStoriesList as Right).value;
@@ -94,13 +96,11 @@ class StoriesCubit extends Cubit<StoriesState> {
     Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
     if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
       // if data is not in local, set it as outdated
-      await resetIgDataUpdate(dataName);
       isOutdated = true;
     } else {
       igDataUpdate = (failureOrIgDataUpdate as Right).value!;
       // check if data is outdated
       if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
-        await resetIgDataUpdate(dataName);
         isOutdated = true;
       } else {
         isOutdated = false;

@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/report.dart';
+import 'package:igshark/presentation/blocs/home/report/cubit/report_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/views/global/info_card.dart';
 import 'package:igshark/presentation/views/global/loading_card.dart';
@@ -16,12 +19,14 @@ class ReportData extends StatelessWidget {
     this.loadingMessage,
     this.report,
     this.isSubscribed = false,
+    this.errorMessage,
   }) : super(key: key);
 
   final Report? report;
   final AccountInfo accountInfo;
   final String? loadingMessage;
   final bool isSubscribed;
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +197,57 @@ class ReportData extends StatelessWidget {
                   ),
                 ),
               )
-            : const SizedBox.shrink(),
+            : (errorMessage != "")
+                ? errorMessageWidget(context, errorMessage)
+                : const SizedBox.shrink(),
       ]),
+    );
+  }
+
+  errorMessageWidget(context, errorMessage) {
+    return Positioned(
+      child: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width / 1.1,
+          height: 130.0,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 158, 156, 156).withOpacity(0.9),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+          margin: const EdgeInsets.only(top: 2.0, bottom: 2.0),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Column(
+                children: [
+                  Text(
+                    (errorMessage!).toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Color.fromARGB(255, 244, 8, 8),
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (errorMessage != "") {
+                        GoRouter.of(context).goNamed('instagram_login', queryParams: {
+                          'updateInstagramAccount': 'true',
+                        });
+                        context.read<ReportCubit>().init();
+                      } else {
+                        context.read<ReportCubit>().init();
+                      }
+                    },
+                    child: Text((errorMessage == "checkpoint required") ? "Pass checkpoint" : "Login"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

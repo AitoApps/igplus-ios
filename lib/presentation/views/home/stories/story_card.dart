@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/stories_user.dart';
 
 import 'package:igshark/presentation/resources/colors_manager.dart';
+import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 
 class StoryCard extends StatelessWidget {
   final StoriesUser userStory;
@@ -45,15 +46,10 @@ class StoryCard extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(3.0),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      decoration: BoxDecoration(
-                        color: ColorsManager.appBack,
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage(userStory.owner.profilePicUrl),
-                        ),
-                      ),
+                    child: CircularCachedImage(
+                      picture: userStory.owner.profilePicUrl,
+                      username: userStory.owner.username,
+                      itemRadius: 56.0,
                     ),
                   ),
                 ),
