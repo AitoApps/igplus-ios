@@ -29,3 +29,8 @@ class UserAuthenticationFailure extends Failure {
 class InstagramSessionFailure extends Failure {
   const InstagramSessionFailure(String message) : super(message);
 }
+
+// settings authentication failures
+class SettingsFailure extends Failure {
+  const SettingsFailure(String message) : super(message);
+}

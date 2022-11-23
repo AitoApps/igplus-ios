@@ -63,7 +63,9 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
     // check if madiaLikers data is outdated
     bool isDataOutdated = await checkIfDataOutdated(DataNames.mediaLikers.name);
 
-    if (isDataOutdated) {
+    mediaLikersList = _getMedialLikersFromLocal(pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+    if (mediaLikersList.isEmpty || isDataOutdated) {
       // get media list from local
       Either<Failure, List<Media>?>? mediaListOrFailure =
           await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
@@ -75,9 +77,12 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
           // get media likers from instagram
           List<MediaLiker>? mediaLikers = await getMediaLikers(mediaId: media.id, boxKey: MediaLiker.boxKey);
           if (mediaLikers != null) {
+            mediaLikersList = [];
             mediaLikersList.addAll(mediaLikers);
             // save media likers to local
             await cacheMediaLikersToLocalUseCase.execute(boxKey: MediaLiker.boxKey, mediaLikersList: mediaLikers);
+            // reset IgDataUpdate
+            await resetIgDataUpdate(DataNames.mediaLikers.name);
           }
 
           await Future.delayed(const Duration(seconds: 2));
@@ -88,43 +93,8 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
         emit(const MediaLikersFailure(message: "We can't load media list, try again later"));
         return null;
       }
-    } else {
-      // get media likers from local
-      final mediaLikersFromLocal = getMediaLikersFromLocalUseCase.execute(
-          boxKey: MediaLiker.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
-
-      if (mediaLikersFromLocal.isRight() && mediaLikersFromLocal.getOrElse(() => null) != null) {
-        mediaLikersList = mediaLikersFromLocal.getOrElse(() => null)!;
-        emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
-        return mediaLikersList;
-      }
-      if (mediaLikersList.isEmpty) {
-        // get media list from local
-        Either<Failure, List<Media>?>? mediaListOrFailure =
-            await getMediaFromLocalUseCase.execute(boxKey: Media.boxKey, pageKey: 0, pageSize: 100);
-
-        if (mediaListOrFailure != null && mediaListOrFailure.isRight()) {
-          mediaList = mediaListOrFailure.getOrElse(() => null) ?? [];
-
-          for (var media in mediaList) {
-            // get media likers from instagram
-            List<MediaLiker>? mediaLikers = await getMediaLikers(mediaId: media.id, boxKey: MediaLiker.boxKey);
-            if (mediaLikers != null) {
-              mediaLikersList.addAll(mediaLikers);
-              // save media likers to local
-              await cacheMediaLikersToLocalUseCase.execute(boxKey: MediaLiker.boxKey, mediaLikersList: mediaLikers);
-            }
-
-            await Future.delayed(const Duration(seconds: 2));
-          }
-          emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
-          return mediaLikersList;
-        } else {
-          emit(const MediaLikersFailure(message: "We can't load media list, try again later"));
-          return null;
-        }
-      }
     }
+
     return null;
   }
 
@@ -321,14 +291,11 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
 
     Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
     if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
-      // if data is not in local, set it as outdated
-      await resetIgDataUpdate(dataName);
       isOutdated = true;
     } else {
       igDataUpdate = (failureOrIgDataUpdate as Right).value!;
       // check if data is outdated
       if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
-        await resetIgDataUpdate(dataName);
         isOutdated = true;
       } else {
         isOutdated = false;
@@ -347,5 +314,19 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
       nextUpdateInMinutes: nextUpdateInMinutes,
     );
     await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
+  }
+
+  List<MediaLiker> _getMedialLikersFromLocal({required int pageKey, required int pageSize, String? searchTerm}) {
+    List<MediaLiker> mediaLikersList = [];
+    // get media likers from local
+    final mediaLikersFromLocal = getMediaLikersFromLocalUseCase.execute(
+        boxKey: MediaLiker.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
+
+    if (mediaLikersFromLocal.isRight() && mediaLikersFromLocal.getOrElse(() => null) != null) {
+      mediaLikersList = mediaLikersFromLocal.getOrElse(() => null)!;
+      emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
+      return mediaLikersList;
+    }
+    return [];
   }
 }

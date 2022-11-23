@@ -123,6 +123,7 @@ class _EngagementPageState extends State<EngagementPage> {
                   InfoCardList(
                     cards: bestFollowers,
                     isLoading: isLoading,
+                    minHeight: 80,
                   ),
                   const SectionTitle(
                     title: "Missed Connections",
@@ -131,6 +132,7 @@ class _EngagementPageState extends State<EngagementPage> {
                   InfoCardList(
                     cards: missedConnections,
                     isLoading: isLoading,
+                    minHeight: 80,
                   ),
                   const SectionTitle(
                     title: "Ghost Followers",
@@ -141,6 +143,7 @@ class _EngagementPageState extends State<EngagementPage> {
                     child: InfoCardList(
                       cards: ghostFollowers,
                       isLoading: isLoading,
+                      minHeight: 80,
                     ),
                   ),
                 ],

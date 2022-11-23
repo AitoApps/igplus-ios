@@ -64,8 +64,12 @@ class ReportCubit extends Cubit<ReportState> {
     });
   }
 
+  String errorMessage = "";
+
   void init() async {
     late AccountInfo accountInfo;
+    errorMessage = "";
+
     // await clearAllBoxesUseCase.execute();
     // await Hive.box<Media>(Media.boxKey).clear();
     // await Hive.box<StoriesUser>(StoriesUser.boxKey).clear();
@@ -110,6 +114,8 @@ class ReportCubit extends Cubit<ReportState> {
           await resetIgDataUpdate(DataNames.accountInfo.name);
 
           emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "New account stats loaded..."));
+        } else {
+          accountInfo = cachedAccountInfo!;
         }
       } else {
         // keep using cached account info
@@ -127,12 +133,9 @@ class ReportCubit extends Cubit<ReportState> {
       // get report from local
       failureOrReport = await getReportFromLocal.execute();
 
-      // check if is report data is outdated
-      isDataOutdated = await checkIfDataOutdated(DataNames.report.name);
-      if (isDataOutdated &&
-          (failureOrReport.isLeft() ||
-              ((failureOrReport as Right).value.followers != accountInfo.followers ||
-                  (failureOrReport as Right).value.followings != accountInfo.followings))) {
+      if (failureOrReport.isLeft() ||
+          ((failureOrReport as Right).value.followers != accountInfo.followers ||
+              (failureOrReport as Right).value.followings != accountInfo.followings)) {
         // track progress of data loading from instagram
         if (failureOrReport.isLeft() || (failureOrReport as Right).value == null) {
           int loadedFriends = 0;
@@ -161,9 +164,6 @@ class ReportCubit extends Cubit<ReportState> {
           final report = (failureOrReport as Right).value;
           emit(ReportSuccess(report: report, accountInfo: accountInfo));
         }
-
-        // reset IgDataUpdate
-        await resetIgDataUpdate(DataNames.report.name);
       } else {
         // get report from local
         final report = (failureOrReport as Right).value;
@@ -171,9 +171,35 @@ class ReportCubit extends Cubit<ReportState> {
           final failure = (failureOrReport as Left).value;
           emit(ReportFailure(message: 'Failed to get report from local', failure: failure));
         } else {
-          emit(ReportSuccess(report: report, accountInfo: accountInfo));
+          emit(ReportSuccess(
+            report: report,
+            accountInfo: accountInfo,
+            errorMessage: errorMessage,
+          ));
         }
       }
+    }
+  }
+
+  // get cachedAccountInfo from local
+  AccountInfo? getAccountInfoFromLocal() {
+    Either<Failure, AccountInfo?> accountInfoEither = getAccountInfoFromLocalUseCase.execute();
+    AccountInfo? cachedAccountInfo = accountInfoEither.fold(
+      (failure) => null,
+      (accountInfo) => accountInfo,
+    );
+    return cachedAccountInfo;
+  }
+
+  getAccountInfoFromInstagram(User currentUser) async {
+    final failureOrAccountInfo =
+        await getAccountInfo.execute(igUserId: currentUser.igUserId, igHeaders: currentUser.igHeaders);
+    if (failureOrAccountInfo.isLeft()) {
+      final failure = (failureOrAccountInfo as Left).value;
+      errorMessage = failure.message;
+      emit(ReportFailure(message: 'Failed to get account info', failure: failure));
+    } else {
+      return (failureOrAccountInfo as Right).value;
     }
   }
 
@@ -184,13 +210,11 @@ class ReportCubit extends Cubit<ReportState> {
     Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
     if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
       // if data is not in local, set it as outdated
-      resetIgDataUpdate(dataName);
       isOutdated = true;
     } else {
       igDataUpdate = (failureOrIgDataUpdate as Right).value!;
       // check if data is outdated
       if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
-        resetIgDataUpdate(dataName);
         isOutdated = true;
       } else {
         isOutdated = false;
@@ -219,26 +243,5 @@ class ReportCubit extends Cubit<ReportState> {
       nextUpdateInMinutes: nextUpdateInMinutes,
     );
     await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
-  }
-
-  // get cachedAccountInfo from local
-  AccountInfo? getAccountInfoFromLocal() {
-    Either<Failure, AccountInfo?> accountInfoEither = getAccountInfoFromLocalUseCase.execute();
-    AccountInfo? cachedAccountInfo = accountInfoEither.fold(
-      (failure) => null,
-      (accountInfo) => accountInfo,
-    );
-    return cachedAccountInfo;
-  }
-
-  getAccountInfoFromInstagram(User currentUser) async {
-    final failureOrAccountInfo =
-        await getAccountInfo.execute(igUserId: currentUser.igUserId, igHeaders: currentUser.igHeaders);
-    if (failureOrAccountInfo.isLeft()) {
-      final failure = (failureOrAccountInfo as Left).value;
-      emit(ReportFailure(message: 'Failed to get account info', failure: failure));
-    } else {
-      return (failureOrAccountInfo as Right).value;
-    }
   }
 }

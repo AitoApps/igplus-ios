@@ -10,7 +10,10 @@ import 'package:igshark/presentation/views/global/loading_indicator.dart';
 class InfoCardList extends StatelessWidget {
   final List<Map> cards;
   final bool isLoading;
-  const InfoCardList({Key? key, required this.cards, this.isLoading = true}) : super(key: key);
+  final double minHeight;
+  final String? parentPage;
+  const InfoCardList({Key? key, required this.cards, this.isLoading = false, this.minHeight = 70.0, this.parentPage})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,20 +44,15 @@ class InfoCardList extends StatelessWidget {
   }) {
     return BlocBuilder<MediaListCubit, MediaListState>(
       builder: (context, state) {
-        if (isLoading) {
-          return loadingCard(context, title, subTitle);
-        } else if (state is MediaListInitial) {
-          return loadingCard(context, title, subTitle);
-        } else if (state is MediaListLoading) {
-          return loadingCard(context, title, subTitle);
-        } else if (state is MediaListFailure) {
-          return Center(child: Text(state.message, style: const TextStyle(color: ColorsManager.downColor)));
-        } else if (state is MediaListSuccess) {
+        if (parentPage == "settings" || state is MediaListSuccess) {
           return GestureDetector(
             onTap: () {
-              if (locked && !isSubscribed) {
+              if (parentPage == "settings") {
+              } else if (locked && !isSubscribed) {
                 GoRouter.of(context).pushNamed('paywall');
-              } else if (type == "mostLikes" ||
+              }
+              // likers and commenters
+              else if (type == "mostLikes" ||
                   type == "mostComments" ||
                   type == "mostLikesAndComments" ||
                   type == "likersNotFollow" ||
@@ -63,6 +61,22 @@ class InfoCardList extends StatelessWidget {
                   type == "leastCommentsGiven" ||
                   type == "noLikesOrComments") {
                 GoRouter.of(context).go('/home/engagement/$type');
+              } else
+
+              // Stories
+              if (type == "mostViewedStories") {
+                return GoRouter.of(context).go('/home/storiesList/$type');
+              } else if (type == "topStoriesViewers" ||
+                  type == "viewersNotFollowingYou" ||
+                  type == "viewersYouDontFollow") {
+                return GoRouter.of(context).go('/home/storiesViewersInsight/$type');
+              } else
+              // Media
+              if (type == "mostPopularMedia" ||
+                  type == "mostLikedMedia" ||
+                  type == "mostCommentedMedia" ||
+                  type == "mostViewedMedia") {
+                GoRouter.of(context).go('/home/mediaList/$type');
               } else {
                 GoRouter.of(context).go('/home/mediaList/$type');
               }
@@ -72,7 +86,7 @@ class InfoCardList extends StatelessWidget {
               elevation: 1,
               margin: const EdgeInsets.fromLTRB(8.0, 0.5, 8.0, 0.5),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: context.width - 16, minHeight: context.height / 10),
+                constraints: BoxConstraints(minWidth: context.width - 16, minHeight: minHeight),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -113,6 +127,15 @@ class InfoCardList extends StatelessWidget {
             ),
           );
         }
+        if (isLoading) {
+          return loadingCard(context, title, subTitle);
+        } else if (state is MediaListInitial) {
+          return loadingCard(context, title, subTitle);
+        } else if (state is MediaListLoading) {
+          return loadingCard(context, title, subTitle);
+        } else if (state is MediaListFailure) {
+          return Center(child: Text(state.message, style: const TextStyle(color: ColorsManager.downColor)));
+        }
         return const Center(child: Text("Unknown state", style: TextStyle(color: ColorsManager.textColor)));
       },
     );
@@ -124,8 +147,7 @@ class InfoCardList extends StatelessWidget {
       elevation: 1,
       margin: const EdgeInsets.fromLTRB(8.0, 0.5, 8.0, 0.5),
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width - 16, minHeight: MediaQuery.of(context).size.height / 10),
+        constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width - 16, minHeight: minHeight),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

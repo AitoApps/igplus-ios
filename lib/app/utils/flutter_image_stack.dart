@@ -3,6 +3,7 @@ library flutter_image_stack;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 
 /// Creates a flutter image stack
@@ -129,7 +130,13 @@ class FlutterImageStack extends StatelessWidget {
   Widget circularImage(String imageUrl) {
     late String username;
     username = imageUrl.split("/").last.split(".jpg")[0];
-    return CircularCachedImage(picture: imageUrl, username: username, itemRadius: itemRadius);
+    return CircularCachedImage(
+      picture: imageUrl,
+      username: username,
+      itemRadius: itemRadius,
+      borderRadius: 1.0,
+      borderColor: ColorsManager.textColor,
+    );
   }
 }
 

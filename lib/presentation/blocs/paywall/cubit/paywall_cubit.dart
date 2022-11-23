@@ -39,7 +39,7 @@ class PaywallCubit extends Cubit<PaywallState> {
     emit(PaywallLoading());
     try {
       final customerInfo = await Purchases.restorePurchases();
-      if (customerInfo != null && customerInfo.entitlements.all["premium"]!.isActive) {
+      if (customerInfo.entitlements.all["premium"]!.isActive) {
         emit(PaywallPaymentSuccess());
       } else {
         emit(PaywallLoaded());

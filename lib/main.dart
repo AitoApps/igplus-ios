@@ -31,6 +31,7 @@ import 'package:igshark/presentation/blocs/home/stories/cubit/stories_cubit.dart
 import 'package:igshark/presentation/blocs/home/user_stories/cubit/user_stories_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/cubit/paywall_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/subscription/cubit/subscription_cubit.dart';
+import 'package:igshark/presentation/blocs/settings/cubit/settings_cubit.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 // import 'package:adapty_flutter/adapty_flutter.dart';
 import 'app/bloc_observer.dart';
@@ -118,6 +119,7 @@ void main() async {
         BlocProvider<SubscriptionCubit>(create: (_) => di.sl<SubscriptionCubit>()),
         BlocProvider<PaywallCubit>(create: (_) => di.sl<PaywallCubit>()),
         BlocProvider<EngagementCubit>(create: (_) => di.sl<EngagementCubit>()),
+        BlocProvider<SettingsCubit>(create: (_) => di.sl<SettingsCubit>()),
         BlocProvider<AppBloc>(create: (_) => di.sl<AppBloc>()),
         BlocProvider<StoryDownloadCubit>(create: (_) => di.sl<StoryDownloadCubit>()),
       ],

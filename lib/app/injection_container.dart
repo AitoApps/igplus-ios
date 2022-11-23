@@ -55,6 +55,7 @@ import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers
 import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/story_download/cubit/story_download_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/cubit/paywall_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/subscription/cubit/subscription_cubit.dart';
+import 'package:igshark/presentation/blocs/settings/cubit/settings_cubit.dart';
 import '../data/models/story_model.dart';
 import '../data/repositories/firebase/firebase_repository_imp.dart';
 import '../data/repositories/firebase/headers_repository_imp.dart';
@@ -134,6 +135,8 @@ Future<void> init() async {
         getUser: sl(),
         cacheStoriesToLocal: sl(),
         getStoriesUseCase: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => StoryViewersCubit(
         getStoryViewersFromLocal: sl(),
@@ -142,6 +145,8 @@ Future<void> init() async {
         getUser: sl(),
         unfollowUserUseCase: sl(),
         cacheStoryViewersToLocalUseCase: sl(),
+        getIgDataUpdateUseCase: sl(),
+        saveIgDataUpdateUseCase: sl(),
       ));
   sl.registerFactory(() => MediaLikersCubit(
         getMediaLikersUseCase: sl(),
@@ -170,6 +175,7 @@ Future<void> init() async {
   sl.registerFactory(() => SubscriptionCubit());
   sl.registerFactory(() => PaywallCubit(getAccountInfoFromLocalUseCase: sl()));
   sl.registerFactory(() => EngagementCubit());
+  sl.registerFactory(() => SettingsCubit(getAccountInfoFromLocalUseCase: sl()));
 
   sl.registerFactory(() => StoryDownloadCubit());
 

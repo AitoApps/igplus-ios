@@ -73,7 +73,7 @@ class InstagramDataSourceImp extends InstagramDataSource {
       // if (jsonResponse['message'].isNotEmpty) {
       //   throw InstagramSessionFailure(jsonResponse['message']);
       // } else {
-      throw const InstagramSessionFailure("get account info by IDInstagram session expired");
+      throw const InstagramSessionFailure("Instagram session expired");
       // }
     }
   }

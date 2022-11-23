@@ -37,7 +37,14 @@ class MediaListCubit extends Cubit<MediaListState> {
     // check if StoriesUser is outdated
     bool isDataOutdated = await checkIfDataOutdated(DataNames.media.name);
 
-    if (isDataOutdated) {
+    // get media list from local
+    final mediaList = await getMediaListFromLocal(
+      boxKey: Media.boxKey,
+      pageKey: 0,
+      pageSize: 1,
+    );
+
+    if (mediaList.isEmpty || isDataOutdated) {
       // get media from instagram
       final mediaList = await getMediaListFromInstagram(
         boxKey: Media.boxKey,
@@ -48,34 +55,13 @@ class MediaListCubit extends Cubit<MediaListState> {
         emit(MediaListSuccess());
         // cache new medai list to local
         cacheMediaToLocal.execute(boxKey: Media.boxKey, mediaList: mediaList);
+        // reset IgDataUpdate
+        await resetIgDataUpdate(DataNames.media.name);
       } else {
         emit(const MediaListFailure(message: 'Failed to get media list from instagram'));
       }
     } else {
-      // get media list from local
-      final mediaList = await getMediaListFromLocal(
-        boxKey: Media.boxKey,
-        pageKey: 0,
-        pageSize: 1,
-      );
-
-      if (mediaList != null) {
-        emit(MediaListSuccess());
-      } else {
-        // get media from instagram
-        final mediaList = await getMediaListFromInstagram(
-          boxKey: Media.boxKey,
-          pageKey: 0,
-        );
-
-        if (mediaList != null) {
-          emit(MediaListSuccess());
-          // cache new medai list to local
-          cacheMediaToLocal.execute(boxKey: Media.boxKey, mediaList: mediaList);
-        } else {
-          emit(const MediaListFailure(message: 'Failed to get media list from instagram'));
-        }
-      }
+      emit(MediaListSuccess());
     }
   }
 
@@ -113,19 +99,19 @@ class MediaListCubit extends Cubit<MediaListState> {
   }
 
   // get cached media from local
-  Future<List<Media>?> getMediaListFromLocal(
+  Future<List<Media>> getMediaListFromLocal(
       {required String boxKey, required int pageKey, required int pageSize, String? searchTerm, String? type}) async {
     final failureOrMedia = await getMediaFromLocal.execute(
         boxKey: boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm, type: type);
     if (failureOrMedia == null || failureOrMedia.isLeft()) {
       emit(const MediaListFailure(message: 'Failed to get media'));
-      return null;
+      return [];
     } else {
       final media = (failureOrMedia as Right).value;
       if (media != null) {
         return media;
       } else {
-        return null;
+        return [];
       }
     }
   }
@@ -137,13 +123,11 @@ class MediaListCubit extends Cubit<MediaListState> {
     Either<Failure, IgDataUpdate?> failureOrIgDataUpdate = getIgDataUpdateUseCase.execute(dataName: dataName);
     if (failureOrIgDataUpdate.isLeft() || (failureOrIgDataUpdate as Right).value == null) {
       // if data is not in local, set it as outdated
-      await resetIgDataUpdate(dataName);
       isOutdated = true;
     } else {
       igDataUpdate = (failureOrIgDataUpdate as Right).value!;
       // check if data is outdated
       if (igDataUpdate.nextUpdateTime.isBefore(DateTime.now())) {
-        await resetIgDataUpdate(dataName);
         isOutdated = true;
       } else {
         isOutdated = false;

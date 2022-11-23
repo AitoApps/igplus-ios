@@ -172,14 +172,21 @@ class _HomePageState extends State<HomePage> {
                     accountInfo: state.accountInfo, loadingMessage: state.loadingMessage, isSubscribed: isSubscribed);
               }
               if (state is ReportSuccess) {
-                return ReportData(report: state.report, accountInfo: state.accountInfo, isSubscribed: isSubscribed);
+                return ReportData(
+                  report: state.report,
+                  accountInfo: state.accountInfo,
+                  isSubscribed: isSubscribed,
+                  errorMessage: state.errorMessage,
+                );
               } else if (state is ReportFailure) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(state.failure.message),
-                      TextButton(
+                      Text(state.failure.message.toUpperCase(), style: const TextStyle(fontSize: 18.0)),
+                      const SizedBox(height: 20.0),
+                      CupertinoButton(
+                        color: ColorsManager.cardBack,
                         onPressed: () {
                           if (state.failure is InstagramSessionFailure) {
                             GoRouter.of(context).goNamed('instagram_login', queryParams: {
@@ -190,8 +197,24 @@ class _HomePageState extends State<HomePage> {
                             context.read<ReportCubit>().init();
                           }
                         },
-                        child: Text((state.failure is InstagramSessionFailure) ? "Login" : "Retry",
-                            style: const TextStyle(color: ColorsManager.primaryColor)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                  (state.failure is InstagramSessionFailure)
+                                      ? (state.failure.message == "checkpoint required")
+                                          ? "Checkpoint"
+                                          : "Login"
+                                      : "Retry",
+                                  style: const TextStyle(color: ColorsManager.primaryColor, fontSize: 14.0)),
+                            ),
+                            const Icon(FontAwesomeIcons.arrowRotateRight,
+                                size: 14.0, color: ColorsManager.primaryColor),
+                          ],
+                        ),
                       ),
                     ],
                   ),

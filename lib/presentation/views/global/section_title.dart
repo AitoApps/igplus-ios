@@ -8,7 +8,7 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 20, 10, 15),
+      padding: const EdgeInsets.fromLTRB(10, 30, 10, 15),
       child: Row(
         children: [
           Icon(
@@ -17,7 +17,13 @@ class SectionTitle extends StatelessWidget {
           ),
           const SizedBox(width: 10.0),
           Text(title,
-              style: const TextStyle(fontSize: 18.0, color: ColorsManager.textColor), textAlign: TextAlign.left),
+              style: const TextStyle(
+                fontSize: 22.0,
+                color: ColorsManager.textColor,
+                fontFamily: "Abel",
+                fontStyle: FontStyle.normal,
+              ),
+              textAlign: TextAlign.left),
         ],
       ),
     );
