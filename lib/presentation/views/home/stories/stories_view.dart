@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-
 
 import 'story_download_button.dart';
 
@@ -32,6 +33,7 @@ class StoriesView extends StatefulWidget {
 
 class _StoriesViewState extends State<StoriesView> {
   final StoryController controller = StoryController();
+  StreamController<int> currentStoryKey = StreamController<int>();
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,7 @@ class _StoriesViewState extends State<StoriesView> {
   @override
   void dispose() {
     controller.dispose();
+    currentStoryKey.close();
     super.dispose();
   }
 
@@ -117,7 +120,6 @@ class _StoriesViewState extends State<StoriesView> {
                 onVerticalDragEnd: (dragUpdateDetails) {
                   GoRouter.of(context).pop();
                 },
-                onLongPress: () {},
                 child: Stack(
                   children: <Widget>[
                     StoryView(
@@ -131,6 +133,8 @@ class _StoriesViewState extends State<StoriesView> {
                         print("${stories[storyItems.indexOf(s)]!.takenAt} is shown");
 
                         widget.currentStory = stories[storyItems.indexOf(s)]!;
+
+                        currentStoryKey.add(widget.currentStory.takenAt);
                       },
                     ),
                     Container(
@@ -163,9 +167,16 @@ class _StoriesViewState extends State<StoriesView> {
                     Positioned(
                       top: MediaQuery.of(context).size.height * 0.08,
                       right: 16,
-                      child: DownloadStory(
-                        currentStory: widget.currentStory,
-                      ),
+                      child: StreamBuilder<int>(
+                          stream: currentStoryKey.stream,
+                          initialData: 0,
+                          builder: (context, snapshot) {
+                            return (snapshot.data != 0)
+                                ? DownloadStory(
+                                    currentStory: widget.currentStory,
+                                  )
+                                : const Text("ghh");
+                          }),
                     ),
                   ],
                 ));
