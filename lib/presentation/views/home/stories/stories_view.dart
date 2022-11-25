@@ -33,7 +33,7 @@ class StoriesView extends StatefulWidget {
 
 class _StoriesViewState extends State<StoriesView> {
   final StoryController controller = StoryController();
-  StreamController<int> currentStoryKey = StreamController<int>();
+  StreamController<Story> currentStoryStream = StreamController<Story>();
   @override
   void initState() {
     super.initState();
@@ -43,7 +43,7 @@ class _StoriesViewState extends State<StoriesView> {
   @override
   void dispose() {
     controller.dispose();
-    currentStoryKey.close();
+    currentStoryStream.close();
     super.dispose();
   }
 
@@ -93,16 +93,16 @@ class _StoriesViewState extends State<StoriesView> {
               }
             }).toList();
 
-            widget.currentStory = stories.firstWhere(
-              (story) {
-                if (story != null &&
-                    (story.mediaType == MediaConstants.TYPE_IMAGE || story.mediaType == MediaConstants.TYPE_VIDEO)) {
-                  return true;
-                } else {
-                  return false;
-                }
-              },
-            )!;
+            // widget.currentStory = stories.firstWhere(
+            //   (story) {
+            //     if (story != null &&
+            //         (story.mediaType == MediaConstants.TYPE_IMAGE || story.mediaType == MediaConstants.TYPE_VIDEO)) {
+            //       return true;
+            //     } else {
+            //       return false;
+            //     }
+            //   },
+            // )!;
 
             return GestureDetector(
                 onHorizontalDragEnd: (dragUpdateDetails) {
@@ -132,9 +132,10 @@ class _StoriesViewState extends State<StoriesView> {
                       onStoryShow: (s) {
                         print("${stories[storyItems.indexOf(s)]!.takenAt} is shown");
 
-                        widget.currentStory = stories[storyItems.indexOf(s)]!;
+                        // widget.currentStory = stories[storyItems.indexOf(s)]!;
+                        final Story currentStory = stories[storyItems.indexOf(s)]!;
 
-                        currentStoryKey.add(widget.currentStory.takenAt);
+                        currentStoryStream.add(currentStory);
                       },
                     ),
                     Container(
@@ -167,15 +168,15 @@ class _StoriesViewState extends State<StoriesView> {
                     Positioned(
                       top: MediaQuery.of(context).size.height * 0.08,
                       right: 16,
-                      child: StreamBuilder<int>(
-                          stream: currentStoryKey.stream,
-                          initialData: 0,
+                      child: StreamBuilder<Story>(
+                          stream: currentStoryStream.stream,
+                          initialData: null,
                           builder: (context, snapshot) {
-                            return (snapshot.data != 0)
+                            return (snapshot.data != null)
                                 ? DownloadStory(
-                                    currentStory: widget.currentStory,
+                                    currentStory: snapshot.data!,
                                   )
-                                : const Text("ghh");
+                                : const CircularProgressIndicator();
                           }),
                     ),
                   ],
