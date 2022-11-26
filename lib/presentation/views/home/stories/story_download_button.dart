@@ -18,8 +18,8 @@ class DownloadStory extends StatelessWidget {
     showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
-                title: const Text("Story downloaded To Gallery"),
-                content: const Text("Do you want to open it?"),
+                title: const Text("Successfully Saved"),
+                content: const Text("story was successfully downloaded into Gallery"),
                 // content: Text(widget.currentStory?.mediaUrl.toString() ?? ""),
                 actions: [
                   CupertinoDialogAction(
@@ -27,15 +27,15 @@ class DownloadStory extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text("Open"),
+                    child: const Text("OK"),
                   ),
-                  CupertinoDialogAction(
-                    //isDestructiveAction: true,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Cancel"),
-                  ),
+                  // CupertinoDialogAction(
+                  //   //isDestructiveAction: true,
+                  //   onPressed: () {
+                  //     Navigator.pop(context);
+                  //   },
+                  //   child: const Text("Cancel"),
+                  // ),
                 ]));
   }
 

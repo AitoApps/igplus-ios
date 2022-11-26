@@ -23,7 +23,7 @@ class StoryDownloadCubit extends Cubit<StoryDownLoadState> {
 
       final path = "${tempDir.path}/$id.mp4";
       await Dio().download(story.mediaUrl, path);
-      final bool? success = await GallerySaver.saveVideo(path, albumName: "IGPlus");
+      final bool? success = await GallerySaver.saveVideo(path, albumName: "IGShark");
 
       if (success == true) {
         emit((StoryDownLoadSuccess(path: path)));
@@ -34,7 +34,7 @@ class StoryDownloadCubit extends Cubit<StoryDownLoadState> {
       final id = DateTime.now().millisecondsSinceEpoch.toString();
       final path = "${tempDir.path}/$id.jpg";
       await Dio().download(story.mediaUrl, path);
-      final bool? success = await GallerySaver.saveImage(path, albumName: "IGPlus");
+      final bool? success = await GallerySaver.saveImage(path, albumName: "IGShark");
 
       if (success == true) {
         emit((StoryDownLoadSuccess(path: path)));
