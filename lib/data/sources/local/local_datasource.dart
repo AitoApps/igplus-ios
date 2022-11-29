@@ -155,6 +155,27 @@ class LocalDataSourceImp extends LocalDataSource {
     }
   }
 
+  // add & remove friend
+  @override
+  Future<void> addFriend({required Friend friend, required String boxKey}) async {
+    Box<Friend> friendsBox = Hive.box<Friend>(boxKey);
+    try {
+      friendsBox.add(friend);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  Future<void> removeFriend({required String friendKey, required String boxKey}) async {
+    Box<Friend> friendsBox = Hive.box<Friend>(boxKey);
+    try {
+      friendsBox.delete(friendKey);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   // get number of friends in the box
   @override
   int getNumberOfFriendsInBox({required String boxKey}) {
