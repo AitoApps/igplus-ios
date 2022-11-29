@@ -10,6 +10,7 @@ import 'package:igshark/presentation/views/global/info_card.dart';
 import 'package:igshark/presentation/views/global/loading_card.dart';
 import 'package:igshark/presentation/views/global/section_title.dart';
 import 'package:igshark/presentation/views/home/profile_card.dart';
+import 'package:igshark/presentation/views/home/stats/line-chart.dart';
 import 'package:igshark/presentation/views/home/stories/stories_list.dart';
 
 class ReportData extends StatelessWidget {
@@ -49,7 +50,6 @@ class ReportData extends StatelessWidget {
                 isSubscribed: isSubscribed,
               ),
             ),
-            // (report != null) ? LineChartSample(chartData: report!.followersChartData) : Container(),
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
               child: Row(
@@ -101,6 +101,7 @@ class ReportData extends StatelessWidget {
                     ),
                   )
                 : Container(),
+            (report != null) ? LineChartSample(chartData: report!.followersChartData) : Container(),
             const StoriesList(),
             const SectionTitle(title: "Important stats", icon: FontAwesomeIcons.chartSimple),
             Padding(
@@ -211,13 +212,14 @@ class ReportData extends StatelessWidget {
           width: MediaQuery.of(context).size.width / 1.1,
           height: 130.0,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 158, 156, 156).withOpacity(0.9),
+            color: ColorsManager.appBack.withOpacity(0.98),
             borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: ColorsManager.secondarytextColor.withOpacity(0.7), width: 3.0),
           ),
           padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
           margin: const EdgeInsets.only(top: 2.0, bottom: 2.0),
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.only(top: 20.0),
             child: Center(
               child: Column(
                 children: [

@@ -1,12 +1,11 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ColorsManager {
   const ColorsManager();
 
-  static const Color primaryColor = Color.fromARGB(255, 106, 245, 166);
+  static const Color primaryColor = Color.fromARGB(255, 78, 198, 230);
   static Brightness brightness = Brightness.dark;
   static const Color appBack = Color.fromARGB(255, 26, 26, 39);
 
@@ -15,7 +14,7 @@ class ColorsManager {
   static const Color secondarytextColor = Color.fromRGBO(163, 162, 189, 1);
 
   // button color
-  static const Color buttonColor1 = Color.fromARGB(255, 106, 245, 166);
+  static const Color buttonColor1 = Color.fromARGB(255, 78, 198, 230);
   static const Color buttonTextColor1 = Color.fromARGB(255, 32, 32, 44);
   static const Color buttonColor2 = Color.fromARGB(255, 54, 56, 77);
   static const Color buttonTextColor2 = Color.fromARGB(255, 226, 226, 226);

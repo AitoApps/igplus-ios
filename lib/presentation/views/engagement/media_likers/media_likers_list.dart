@@ -129,9 +129,11 @@ class _MediaLikersListState extends State<MediaLikersList> {
                 // print(e);
               }
             }
-            setState(() {
-              _showSearchForm = !_showSearchForm;
-            });
+            if (mounted) {
+              setState(() {
+                _showSearchForm = !_showSearchForm;
+              });
+            }
           },
           child: const Icon(
             Icons.search,

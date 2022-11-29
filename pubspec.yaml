@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 0.0.4+4
 
 environment:
   sdk: ">=2.18.0 <3.0.0"
@@ -51,6 +51,16 @@ dev_dependencies:
     sdk: flutter
   hive_generator: ^1.1.3
   mockito: ^5.2.0
+  flutter_native_splash: ^2.2.15
+
+  # splash screen
+flutter_native_splash:
+  image: assets/images/splashScreenBackground.png
+  color: "#6fc7dc"
+  android_12:
+    image: assets/images/splashScreenBackground.png
+    color: "#6fc7dc"
+
 flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:

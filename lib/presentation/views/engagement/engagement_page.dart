@@ -32,10 +32,11 @@ class _EngagementPageState extends State<EngagementPage> {
 
   Future updateCustomerStatus() async {
     final customerInfo = await Purchases.getCustomerInfo();
-
-    setState(() {
-      isSubscribed = customerInfo.entitlements.all['premium']?.isActive ?? false;
-    });
+    if (mounted) {
+      setState(() {
+        isSubscribed = customerInfo.entitlements.all['premium']?.isActive ?? false;
+      });
+    }
   }
 
   Widget build(BuildContext context) {

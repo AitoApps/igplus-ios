@@ -58,17 +58,14 @@ class ReportCubit extends Cubit<ReportState> {
     required this.getWhoAdmiresYouFromLocalUseCase,
     required this.getIgDataUpdateUseCase,
     required this.saveIgDataUpdateUseCase,
-  }) : super(ReportInitial()) {
-    authSubscription = authRepository.authUser.listen((user) {
-      init();
-    });
-  }
+  }) : super(ReportInitial());
 
   String errorMessage = "";
 
   void init() async {
     late AccountInfo accountInfo;
     errorMessage = "";
+    bool isReportSuccess = false;
 
     // await clearAllBoxesUseCase.execute();
     // await Hive.box<Media>(Media.boxKey).clear();
@@ -123,7 +120,7 @@ class ReportCubit extends Cubit<ReportState> {
       }
 
       // TODO check if account was changed
-      if (currentUser.igUserId != cachedAccountInfo!.igUserId) {
+      if (cachedAccountInfo != null && currentUser.igUserId != cachedAccountInfo.igUserId) {
         // clear all boxes if user changed
         await clearAllBoxesUseCase.execute();
       }
@@ -146,12 +143,16 @@ class ReportCubit extends Cubit<ReportState> {
                   accountInfo: accountInfo,
                   loadingMessage: "$loadedFriends of ${accountInfo.followers} Friends Loaded..."));
             } else {
-              emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
+              if (isReportSuccess == false) {
+                emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
+              }
               timer.cancel();
             }
           });
         } else {
-          emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
+          if (isReportSuccess == false) {
+            emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
+          }
         }
 
         // update report
@@ -162,6 +163,7 @@ class ReportCubit extends Cubit<ReportState> {
           emit(ReportFailure(message: 'Failed to update report', failure: failure));
         } else {
           final report = (failureOrReport as Right).value;
+          isReportSuccess = true;
           emit(ReportSuccess(report: report, accountInfo: accountInfo));
         }
       } else {
@@ -171,6 +173,7 @@ class ReportCubit extends Cubit<ReportState> {
           final failure = (failureOrReport as Left).value;
           emit(ReportFailure(message: 'Failed to get report from local', failure: failure));
         } else {
+          isReportSuccess = true;
           emit(ReportSuccess(
             report: report,
             accountInfo: accountInfo,

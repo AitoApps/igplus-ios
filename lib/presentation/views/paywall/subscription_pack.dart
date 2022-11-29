@@ -51,15 +51,16 @@ class SubscriptionPack extends StatelessWidget {
                       Text(title,
                           style: const TextStyle(
                             color: ColorsManager.textColor,
-                            fontSize: 24.0,
+                            fontSize: 20.0,
                             fontFamily: 'Abel',
                             fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.left),
                       Text(saveText,
                           style: const TextStyle(
                             color: ColorsManager.secondarytextColor,
-                            fontSize: 16.0,
+                            fontSize: 12.0,
                             fontFamily: 'Abel',
                             fontStyle: FontStyle.normal,
                           ),
@@ -69,7 +70,7 @@ class SubscriptionPack extends StatelessWidget {
                   Text(monthlyPrice,
                       style: const TextStyle(
                         color: ColorsManager.primaryColor,
-                        fontSize: 18.0,
+                        fontSize: 16.0,
                         fontFamily: 'Abel',
                         fontStyle: FontStyle.normal,
                         fontWeight: FontWeight.bold,

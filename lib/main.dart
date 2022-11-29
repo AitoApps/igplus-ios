@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +35,6 @@ import 'package:igshark/presentation/blocs/paywall/cubit/paywall_cubit.dart';
 import 'package:igshark/presentation/blocs/paywall/subscription/cubit/subscription_cubit.dart';
 import 'package:igshark/presentation/blocs/settings/cubit/settings_cubit.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-// import 'package:adapty_flutter/adapty_flutter.dart';
 import 'app/bloc_observer.dart';
 import 'app/injection_container.dart' as di;
 
@@ -95,9 +96,16 @@ void main() async {
 
   // inapp purchase configuration
   // revenuecat
-  await Purchases.configure(PurchasesConfiguration("appl_QivdadMnvjMBVqgSUzWqhEoYSlL"));
-  // adapty
-  // Adapty.activate();
+  final String apiKey;
+  if (Platform.isAndroid) {
+    // apiKey Android
+    apiKey = "goog_jTbejulNISJfiKvxEfNvzVqpAUY";
+  } else {
+    // apiKey IOS
+    apiKey = "appl_QivdadMnvjMBVqgSUzWqhEoYSlL";
+  }
+
+  await Purchases.configure(PurchasesConfiguration(apiKey));
 
   await di.init();
   Bloc.observer = AppBlocObserver();

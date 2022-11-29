@@ -37,13 +37,18 @@ class _HomePageState extends State<HomePage> {
   Future updateCustomerStatus() async {
     final customerInfo = await Purchases.getCustomerInfo();
 
-    setState(() {
-      isSubscribed = customerInfo.entitlements.all['premium']?.isActive ?? false;
-    });
+    if (mounted) {
+      setState(() {
+        isSubscribed = customerInfo.entitlements.all['premium']?.isActive ?? false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // initialize home page report
+    BlocProvider.of<ReportCubit>(context).init();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
