@@ -132,9 +132,11 @@ class _MediaCommentersListState extends State<MediaCommentersList> {
                 // print(e);
               }
             }
-            setState(() {
-              _showSearchForm = !_showSearchForm;
-            });
+            if (mounted) {
+              setState(() {
+                _showSearchForm = !_showSearchForm;
+              });
+            }
           },
           child: const Icon(
             Icons.search,

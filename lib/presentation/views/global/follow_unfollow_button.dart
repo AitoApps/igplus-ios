@@ -50,15 +50,19 @@ class _FollowUnfollowButtonState extends State<FollowUnfollowButton> {
           bool followUserRs = await context.read<FriendsListCubit>().followUser(userId: widget.igUserId);
           print("followUserRs: $followUserRs");
           if (followUserRs) {
-            setState(() {
-              showFollow = false;
-              isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                showFollow = false;
+                isLoading = false;
+              });
+            }
           } else {
-            setState(() {
-              error = "Error! try again later";
-              isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                error = "Error! try again later";
+                isLoading = false;
+              });
+            }
           }
         },
         child: const Text("Follow", style: TextStyle(color: ColorsManager.buttonTextColor1, fontSize: 10.0)),
@@ -82,15 +86,19 @@ class _FollowUnfollowButtonState extends State<FollowUnfollowButton> {
           bool followUserRs = await context.read<FriendsListCubit>().unfollowUser(userId: widget.igUserId);
           print("unfollowUserRs: $followUserRs");
           if (followUserRs) {
-            setState(() {
-              showFollow = true;
-              isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                showFollow = true;
+                isLoading = false;
+              });
+            }
           } else {
-            setState(() {
-              error = "Error! try again later";
-              isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                error = "Error! try again later";
+                isLoading = false;
+              });
+            }
           }
         },
         child: const Text("Unfollow", style: TextStyle(color: ColorsManager.buttonTextColor2, fontSize: 10.0)),

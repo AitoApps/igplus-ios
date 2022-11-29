@@ -54,5 +54,7 @@
 		<string>public_live_E8ixjTdL.RWaYvzu09uGlkKPOC61x</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>This app requires access to the photo library.</string>
+		<key>UIStatusBarHidden</key>
+		<false/>
 	</dict>
 </plist>

@@ -34,9 +34,11 @@ class _PaywallState extends State<Paywall> {
   Future updateCustomerStatus() async {
     final customerInfo = await Purchases.getCustomerInfo();
 
-    setState(() {
-      isSubscribed = customerInfo.entitlements.all['premium']?.isActive ?? false;
-    });
+    if (mounted) {
+      setState(() {
+        isSubscribed = customerInfo.entitlements.all['premium']?.isActive ?? false;
+      });
+    }
   }
 
   @override
@@ -133,7 +135,7 @@ class _PaywallState extends State<Paywall> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      feature("Get access to our most exlusive data"),
+                      feature("Get access to our most exclusive data"),
                       feature("Watch all instagram stories anonymously"),
                       feature("Find out who unfollowed you"),
                       feature("Discover your secret admires"),
@@ -147,7 +149,7 @@ class _PaywallState extends State<Paywall> {
                                 getCurrency(packages.first.storeProduct.priceString, packages.first.storeProduct.price);
 
                             int counter = 0;
-                            selected ??= packages[1].storeProduct.identifier;
+                            selected ??= packages[0].storeProduct.identifier;
                             for (var package in packages) {
                               counter++;
                               final product = package.storeProduct;
@@ -164,7 +166,7 @@ class _PaywallState extends State<Paywall> {
                                     saveText: getSaveText(numberOfMonths),
                                     monthlyPrice: '$currency${getmonthlyPrice(numberOfMonths, product.price)}',
                                     productId: product.identifier,
-                                    selected: selected ?? packages[1].storeProduct.identifier,
+                                    selected: selected ?? packages[0].storeProduct.identifier,
                                     mostPopular: (counter == 2) ? true : false,
                                   ),
                                 ),
