@@ -2,14 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:igshark/domain/entities/friend.dart';
-import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:igshark/presentation/views/global/circular_cached_image.dart';
 import 'package:igshark/presentation/views/global/follow_unfollow_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:provider/provider.dart';
 
 /// List item representing a single Character with its photo and name.
 class FriendListItem extends StatefulWidget {
@@ -34,9 +32,9 @@ class _FriendListItemState extends State<FriendListItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.type == 'notFollowingBack') {
+    if (widget.type == Friend.notFollowingBackBoxKey) {
       showFollowButton = false;
-    } else if (widget.type == 'mutualFollowings') {
+    } else if (widget.type == Friend.mutualFollowingsBoxKey) {
       showFollowButton = false;
     }
     return Padding(
@@ -68,8 +66,9 @@ class _FriendListItemState extends State<FriendListItem> {
           ),
         ),
         trailing: FollowUnfollowButton(
-          igUserId: widget.friend.igUserId,
-          showFollow: showFollowButton,
+          friend: widget.friend,
+          showFollow: (widget.friend.requestedByMe != null && widget.friend.requestedByMe!) ? false : showFollowButton,
+          boxKey: widget.type,
         ),
       ),
     );

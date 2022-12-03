@@ -4,5 +4,9 @@ import 'package:equatable/equatable.dart';
 part 'engagement_state.dart';
 
 class EngagementCubit extends Cubit<EngagementState> {
-  EngagementCubit() : super(EngagementInitial());
+  EngagementCubit() : super(EngagementLoading());
+
+  setEngagmentState(EngagementState state) {
+    emit(state);
+  }
 }

@@ -11,6 +11,7 @@ import 'package:igshark/domain/repositories/firebase/firebase_repository.dart';
 import 'package:igshark/domain/repositories/firebase/headers_repository.dart';
 import 'package:igshark/domain/repositories/instagram/instagram_repository.dart';
 import 'package:igshark/domain/repositories/local/local_repository.dart';
+import 'package:igshark/domain/usecases/add_friends_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/clear_local_data_use_case.dart';
 import 'package:igshark/domain/usecases/follow_user_use_case.dart';
 import 'package:igshark/domain/usecases/get_account_info_from_local_use_case.dart';
@@ -29,6 +30,7 @@ import 'package:igshark/domain/usecases/get_friends_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_report_from_local_use_case.dart';
 import 'package:igshark/domain/usecases/get_stories_users_use_case.dart';
 import 'package:igshark/domain/usecases/get_who_admires_you_from_local_use_case.dart';
+import 'package:igshark/domain/usecases/remove_friends_from_local_use_case%20copy.dart';
 import 'package:igshark/domain/usecases/save_account_info_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_friends_to_local_use_case.dart';
 import 'package:igshark/domain/usecases/save_media_commenters_to_local_use_case.dart';
@@ -102,8 +104,14 @@ Future<void> init() async {
         saveIgDataUpdateUseCase: sl(),
       ));
 
-  sl.registerFactory(() =>
-      FriendsListCubit(getFriendsFromLocal: sl(), followUserUseCase: sl(), getUser: sl(), unfollowUserUseCase: sl()));
+  sl.registerFactory(() => FriendsListCubit(
+        getFriendsFromLocal: sl(),
+        followUserUseCase: sl(),
+        getUser: sl(),
+        unfollowUserUseCase: sl(),
+        addFriendToLocal: sl(),
+        removeFriendFromLocal: sl(),
+      ));
   sl.registerFactory(() => UserStoriesCubit(
         getUserStories: sl(),
         getUser: sl(),
@@ -227,6 +235,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetWhoAdmiresYouFromLocalUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => GetIgDataUpdateUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => SaveIgDataUpdateUseCase(localRepository: sl()));
+  sl.registerLazySingleton(() => AddFriendToLocalUseCase(localRepository: sl()));
+  sl.registerLazySingleton(() => RemoveFriendFromLocalUseCase(localRepository: sl()));
 
   // Repositories
   sl.registerLazySingleton<FirebaseRepository>(() => FirebaseRepositporyImp(firebaseDataSource: sl()));

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    BlocProvider.of<ReportCubit>(context).init();
     Purchases.addCustomerInfoUpdateListener((_) => updateCustomerStatus());
     updateCustomerStatus();
   }
@@ -46,9 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // initialize home page report
-    BlocProvider.of<ReportCubit>(context).init();
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -223,6 +218,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
+                );
+              } else if (state is ReportAccountChanging) {
+                return const Center(
+                  child: CupertinoActivityIndicator(),
                 );
               } else {
                 return const Center(

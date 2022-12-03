@@ -39,6 +39,7 @@ class _EngagementPageState extends State<EngagementPage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     loadLikesAndComments(context);
     List<Map> bestFollowers = [
@@ -110,11 +111,15 @@ class _EngagementPageState extends State<EngagementPage> {
         thickness: 0,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-          child: BlocBuilder<EngagementCubit, EngagementState>(
-            builder: (context, state) {
+          child: BlocConsumer<EngagementCubit, EngagementState>(
+            listener: (context, state) {
               if (state is EngagementLoaded) {
                 isLoading = false;
+              } else {
+                isLoading = true;
               }
+            },
+            builder: (context, state) {
               return ListView(
                 children: <Widget>[
                   const SectionTitle(
@@ -157,7 +162,7 @@ class _EngagementPageState extends State<EngagementPage> {
   }
 
   loadLikesAndComments(context) async {
-    BlocProvider.of<EngagementCubit>(context).emit(EngagementLoading());
+    BlocProvider.of<EngagementCubit>(context).setEngagmentState(EngagementLoading());
     // initialize media data
     await BlocProvider.of<MediaListCubit>(context).init();
     // get likers data
@@ -167,6 +172,6 @@ class _EngagementPageState extends State<EngagementPage> {
     // get commenters data
     await BlocProvider.of<MediaCommentersCubit>(context).init(boxKey: MediaCommenter.boxKey, pageKey: 0, pageSize: 15);
 
-    BlocProvider.of<EngagementCubit>(context).emit(EngagementLoaded());
+    BlocProvider.of<EngagementCubit>(context).setEngagmentState(EngagementLoaded());
   }
 }

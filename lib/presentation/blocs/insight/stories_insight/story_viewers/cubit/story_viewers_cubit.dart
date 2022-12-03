@@ -115,7 +115,7 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
   }
 
   // follow user
-  Future<bool> followUser({required int userId}) async {
+  Future<bool> followUser({required String userId}) async {
     final failureOrCurrentUser = await getUser.execute();
     if (failureOrCurrentUser.isLeft()) {
       return false;
@@ -132,7 +132,7 @@ class StoryViewersCubit extends Cubit<StoryViewersState> {
   }
 
   // unfollow user
-  Future<bool> unfollowUser({required int userId}) async {
+  Future<bool> unfollowUser({required String userId}) async {
     final failureOrCurrentUser = await getUser.execute();
     if (failureOrCurrentUser.isLeft()) {
       return false;

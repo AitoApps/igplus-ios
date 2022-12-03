@@ -95,8 +95,9 @@ class _StoriesViewersInsightListItemState extends State<StoriesViewersInsightLis
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FollowUnfollowButton(
-                igUserId: widget.storiesTopViewer.user.igUserId,
+                friend: widget.storiesTopViewer.user,
                 showFollow: showFollowButton,
+                boxKey: StoriesViewer.boxKey,
               ),
               const SizedBox(height: 4),
               (widget.storiesTopViewer.followedBy)

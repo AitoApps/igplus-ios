@@ -61,6 +61,17 @@ class LocalRepositoryImpl implements LocalRepository {
     }
   }
 
+  // add & remove friend
+  @override
+  Future<void> addFriend({required Friend friend, required String boxKey}) async {
+    await localDataSource.addFriend(friend: friend, boxKey: boxKey);
+  }
+
+  @override
+  Future<void> removeFriend({required Friend friend, required String boxKey}) async {
+    await localDataSource.removeFriend(friend: friend, boxKey: boxKey);
+  }
+
   // get number of friends in box
   @override
   Either<Failure, int> getNumberOfFriendsInBox({required String boxKey}) {

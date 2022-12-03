@@ -43,13 +43,13 @@ abstract class InstagramRepository {
 
   // follow user
   Future<Either<Failure, bool>> followUser({
-    required int userId,
+    required String userId,
     required IgHeaders igHeaders,
   });
 
   // unfollow user
   Future<Either<Failure, bool>> unfollowUser({
-    required int userId,
+    required String userId,
     required IgHeaders igHeaders,
   });
 

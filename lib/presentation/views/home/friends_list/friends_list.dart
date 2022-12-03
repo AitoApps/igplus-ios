@@ -90,22 +90,22 @@ class _FriendsListState extends State<FriendsList> {
   Widget build(BuildContext context) {
     final String pageTitle;
     switch (widget.type) {
-      case "notFollowingBack":
+      case Friend.notFollowingBackBoxKey:
         pageTitle = "Didn't Following You Back";
         break;
-      case "youDontFollowBack":
+      case Friend.youDontFollowBackBoxKey:
         pageTitle = "You Don't Follow Back";
         break;
-      case "newFollowers":
+      case Friend.newFollowersBoxKey:
         pageTitle = "New Followers";
         break;
-      case "lostFollowers":
+      case Friend.lostFollowersBoxKey:
         pageTitle = "Lost Followers";
         break;
-      case "youHaveUnfollowed":
+      case Friend.youHaveUnfollowedBoxKey:
         pageTitle = "You Have Unfollowed";
         break;
-      case "mutualFollowings":
+      case Friend.mutualFollowingsBoxKey:
         pageTitle = "Mutual Followings";
         break;
 

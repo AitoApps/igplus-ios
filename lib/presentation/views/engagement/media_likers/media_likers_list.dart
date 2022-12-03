@@ -150,7 +150,7 @@ class _MediaLikersListState extends State<MediaLikersList> {
           body: BlocConsumer<MediaLikersCubit, MediaLikersState>(
             listener: (context, state) {
               if (state is MediaLikersLoading) {
-                BlocProvider.of<EngagementCubit>(context).emit(EngagementLoading());
+                BlocProvider.of<EngagementCubit>(context).setEngagmentState(EngagementLoading());
               }
             },
             builder: (context, state) {

@@ -28,6 +28,9 @@ abstract class LocalRepository {
     required List<Friend> friendsList,
     required String boxKey,
   });
+  Future<void> addFriend({required Friend friend, required String boxKey});
+  Future<void> removeFriend({required Friend friend, required String boxKey});
+
   Either<Failure, int> getNumberOfFriendsInBox({required String boxKey});
 
   // Media

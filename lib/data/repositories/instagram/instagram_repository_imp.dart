@@ -148,7 +148,7 @@ class InstagramRepositoryImp extends InstagramRepository {
 
   // follow user
   @override
-  Future<Either<Failure, bool>> followUser({required int userId, required IgHeaders igHeaders}) async {
+  Future<Either<Failure, bool>> followUser({required String userId, required IgHeaders igHeaders}) async {
     try {
       final Map<String, String> headers = igHeaders.toMap();
       final bool isFollowed = await instagramDataSource.followUser(userId: userId, headers: headers);
@@ -164,7 +164,7 @@ class InstagramRepositoryImp extends InstagramRepository {
 
   // unfollow user
   @override
-  Future<Either<Failure, bool>> unfollowUser({required int userId, required IgHeaders igHeaders}) async {
+  Future<Either<Failure, bool>> unfollowUser({required String userId, required IgHeaders igHeaders}) async {
     try {
       final Map<String, String> headers = igHeaders.toMap();
       final bool isUnfollowed = await instagramDataSource.unfollowUser(userId: userId, headers: headers);

@@ -2,6 +2,7 @@ import 'package:igshark/domain/entities/friend.dart';
 import 'package:igshark/domain/entities/story_viewer.dart';
 
 class StoriesViewer {
+  static const boxKey = "storyViewersBoxKey";
   final String id;
   final int viewsCount;
   final bool hasLiked;

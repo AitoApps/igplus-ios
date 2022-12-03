@@ -14,13 +14,14 @@ class Friend extends Equatable {
   static const String mutualFollowingsBoxKey = "mutualFollowingsBoxKey";
   static const String youHaveUnfollowedBoxKey = "youHaveUnfollowedBoxKey";
   static const String newStoryViewersBoxKey = "newStoryViewersBoxKey";
+  static const String whoAdmiresYouBoxKey = "whoAdmiresYouBoxKey";
 
   // stories
   static const topStoriesViewersBoxKey = 'topStoriesViewersBoxKey';
   static const viewersNotFollowingYouBoxKey = 'viewersNotFollowingYouBoxKey';
 
   @HiveField(0)
-  final int igUserId;
+  final String igUserId;
   @HiveField(1)
   final String username;
   @HiveField(2)
@@ -43,6 +44,27 @@ class Friend extends Equatable {
     required this.hasRequestedMe,
     required this.requestedByMe,
   });
+
+  // friend setter
+  Friend copyWith({
+    String? igUserId,
+    String? username,
+    String? picture,
+    DateTime? createdOn,
+    bool? hasBlockedMe,
+    bool? hasRequestedMe,
+    bool? requestedByMe,
+  }) {
+    return Friend(
+      igUserId: igUserId ?? this.igUserId,
+      username: username ?? this.username,
+      picture: picture ?? this.picture,
+      createdOn: createdOn ?? this.createdOn,
+      hasBlockedMe: hasBlockedMe ?? this.hasBlockedMe,
+      hasRequestedMe: hasRequestedMe ?? this.hasRequestedMe,
+      requestedByMe: requestedByMe ?? this.requestedByMe,
+    );
+  }
 
   @override
   // TODO: implement props
