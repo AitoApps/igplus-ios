@@ -17,6 +17,8 @@ abstract class LocalDataSource {
   Future<void> cacheReport({required Report report});
   List<Friend>? getCachedFriendsList({required String boxKey, int? pageKey, int? pageSize, String? searchTerm});
   Future<void> cacheFriendsList({required List<Friend> friendsList, required String boxKey});
+  Future<void> addFriend({required Friend friend, required String boxKey});
+  Future<void> removeFriend({required Friend friend, required String boxKey});
   int getNumberOfFriendsInBox({required String boxKey});
   List<Media>? getCachedMediaList(
       {required String boxKey, int? pageKey, int? pageSize, String? searchTerm, String? type});
@@ -148,7 +150,7 @@ class LocalDataSourceImp extends LocalDataSource {
 
     try {
       for (var e in newFriendsListToAdd) {
-        friendsBox.add(e);
+        friendsBox.put(e.igUserId, e);
       }
     } catch (e) {
       print(e);
@@ -158,19 +160,54 @@ class LocalDataSourceImp extends LocalDataSource {
   // add & remove friend
   @override
   Future<void> addFriend({required Friend friend, required String boxKey}) async {
-    Box<Friend> friendsBox = Hive.box<Friend>(boxKey);
+    Box<Friend> followingBox = Hive.box<Friend>(Friend.followingsBoxKey);
+    Box<Friend> usersBox = Hive.box<Friend>(boxKey);
+
+    // set user as followed by me
+    Friend newFriend = friend.copyWith(requestedByMe: true);
+
     try {
-      friendsBox.add(friend);
+      // add to followers box
+      followingBox.put(friend.igUserId, friend);
+      if (boxKey == Friend.youDontFollowBackBoxKey) {
+        // save new user
+        usersBox.delete(friend.igUserId);
+        Box<Friend> mutualFriendsBox = Hive.box<Friend>(Friend.mutualFollowingsBoxKey);
+        mutualFriendsBox.put(friend.igUserId, friend);
+      } else if (boxKey == Friend.mutualFollowingsBoxKey) {
+        // save new user
+        usersBox.delete(friend.igUserId);
+        Box<Friend> youDontFollowBackBox = Hive.box<Friend>(Friend.youDontFollowBackBoxKey);
+        youDontFollowBackBox.put(friend.igUserId, friend);
+      } else {
+        // update user
+        usersBox.put(friend.igUserId, newFriend);
+      }
     } catch (e) {
       print(e);
     }
   }
 
   @override
-  Future<void> removeFriend({required String friendKey, required String boxKey}) async {
-    Box<Friend> friendsBox = Hive.box<Friend>(boxKey);
+  Future<void> removeFriend({required Friend friend, required String boxKey}) async {
+    Box<Friend> followingBox = Hive.box<Friend>(Friend.followingsBoxKey);
+    Box<Friend> usersBox = Hive.box<Friend>(boxKey);
     try {
-      friendsBox.delete(friendKey);
+      followingBox.delete(friend.igUserId);
+      if (boxKey == Friend.youDontFollowBackBoxKey) {
+        // save new user
+        usersBox.delete(friend.igUserId);
+        Box<Friend> youHaveUnfollowedBox = Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey);
+        youHaveUnfollowedBox.put(friend.igUserId, friend);
+      } else if (boxKey == Friend.mutualFollowingsBoxKey) {
+        // save new user
+        usersBox.delete(friend.igUserId);
+        Box<Friend> youDontFollowBackBox = Hive.box<Friend>(Friend.youDontFollowBackBoxKey);
+        youDontFollowBackBox.put(friend.igUserId, friend);
+      } else {
+        // update user
+        usersBox.delete(friend.igUserId);
+      }
     } catch (e) {
       print(e);
     }
@@ -201,7 +238,7 @@ class LocalDataSourceImp extends LocalDataSource {
 
     try {
       for (var e in newMediaListToAdd) {
-        mediaBox.add(e);
+        mediaBox.put(e.id, e);
       }
     } catch (e) {
       print(e);

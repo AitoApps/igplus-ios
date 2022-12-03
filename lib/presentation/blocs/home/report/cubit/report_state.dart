@@ -27,7 +27,7 @@ class ReportSuccess extends ReportState {
   List<Object> get props => [report, accountInfo, errorMessage ?? ""];
 }
 
-class ReportAccountChanged extends ReportState {}
+class ReportAccountChanging extends ReportState {}
 
 class ReportAccountInfoLoaded extends ReportState {
   final AccountInfo accountInfo;

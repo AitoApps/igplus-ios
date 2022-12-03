@@ -104,8 +104,14 @@ Future<void> init() async {
         saveIgDataUpdateUseCase: sl(),
       ));
 
-  sl.registerFactory(() =>
-      FriendsListCubit(getFriendsFromLocal: sl(), followUserUseCase: sl(), getUser: sl(), unfollowUserUseCase: sl()));
+  sl.registerFactory(() => FriendsListCubit(
+        getFriendsFromLocal: sl(),
+        followUserUseCase: sl(),
+        getUser: sl(),
+        unfollowUserUseCase: sl(),
+        addFriendToLocal: sl(),
+        removeFriendFromLocal: sl(),
+      ));
   sl.registerFactory(() => UserStoriesCubit(
         getUserStories: sl(),
         getUser: sl(),

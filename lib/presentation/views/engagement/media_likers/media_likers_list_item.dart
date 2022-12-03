@@ -71,8 +71,9 @@ class _MediaLikersListItemState extends State<MediaLikersListItem> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FollowUnfollowButton(
-                igUserId: widget.mediaLikers.mediaLikerList.first.user.igUserId,
+                friend: widget.mediaLikers.mediaLikerList.first.user,
                 showFollow: (widget.mediaLikers.following) ? false : true,
+                boxKey: MediaLikers.boxKey,
               ),
               const SizedBox(height: 4),
               (widget.mediaLikers.followedBy)

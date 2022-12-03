@@ -8,7 +8,7 @@ class FollowUserUseCase {
   FollowUserUseCase({required this.instagramRepository});
 
   // follow user
-  Future<Either<Failure, bool>> execute({required int userId, required IgHeaders igHeaders}) async {
+  Future<Either<Failure, bool>> execute({required String userId, required IgHeaders igHeaders}) async {
     return instagramRepository.followUser(userId: userId, igHeaders: igHeaders);
   }
 }

@@ -17,7 +17,7 @@ class FriendAdapter extends TypeAdapter<Friend> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Friend(
-      igUserId: fields[0] as int,
+      igUserId: fields[0] as String,
       username: fields[1] as String,
       picture: fields[2] as String,
       createdOn: fields[3] as DateTime,

@@ -88,8 +88,9 @@ class _WhoAdmiresYouListItemState extends State<WhoAdmiresYouListItem> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FollowUnfollowButton(
-                igUserId: widget.whoAdmiresYou.user.igUserId,
+                friend: widget.whoAdmiresYou.user,
                 showFollow: (widget.whoAdmiresYou.following) ? false : true,
+                boxKey: widget.type,
               ),
               const SizedBox(height: 4),
               (widget.whoAdmiresYou.followedBy)

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:igshark/domain/entities/friend.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
 import 'package:igshark/presentation/views/global/loading_indicator.dart';
@@ -6,8 +7,10 @@ import 'package:provider/provider.dart';
 
 class FollowUnfollowButton extends StatefulWidget {
   final bool showFollow;
-  final int igUserId;
-  const FollowUnfollowButton({Key? key, required this.showFollow, required this.igUserId}) : super(key: key);
+  final Friend friend;
+  final String boxKey;
+  const FollowUnfollowButton({Key? key, required this.showFollow, required this.friend, required this.boxKey})
+      : super(key: key);
 
   @override
   State<FollowUnfollowButton> createState() => _FollowUnfollowButtonState();
@@ -30,11 +33,11 @@ class _FollowUnfollowButtonState extends State<FollowUnfollowButton> {
                 child: LoadingIndicator(),
               )
             : (showFollow!)
-                ? followButton()
-                : unfollowButton();
+                ? followButton(boxKey: widget.boxKey)
+                : unfollowButton(boxKey: widget.boxKey);
   }
 
-  Widget followButton() {
+  Widget followButton({required String boxKey}) {
     return SizedBox(
       width: 76.0,
       height: 25.0,
@@ -47,7 +50,10 @@ class _FollowUnfollowButtonState extends State<FollowUnfollowButton> {
           setState(() {
             isLoading = true;
           });
-          bool followUserRs = await context.read<FriendsListCubit>().followUser(userId: widget.igUserId);
+          bool followUserRs = await context.read<FriendsListCubit>().followUser(
+                friend: widget.friend,
+                boxKey: boxKey,
+              );
           print("followUserRs: $followUserRs");
           if (followUserRs) {
             if (mounted) {
@@ -70,7 +76,7 @@ class _FollowUnfollowButtonState extends State<FollowUnfollowButton> {
     );
   }
 
-  Widget unfollowButton() {
+  Widget unfollowButton({required String boxKey}) {
     return SizedBox(
       width: 76.0,
       height: 25.0,
@@ -83,7 +89,8 @@ class _FollowUnfollowButtonState extends State<FollowUnfollowButton> {
           setState(() {
             isLoading = true;
           });
-          bool followUserRs = await context.read<FriendsListCubit>().unfollowUser(userId: widget.igUserId);
+          bool followUserRs =
+              await context.read<FriendsListCubit>().unfollowUser(friend: widget.friend, boxKey: boxKey);
           print("unfollowUserRs: $followUserRs");
           if (followUserRs) {
             if (mounted) {

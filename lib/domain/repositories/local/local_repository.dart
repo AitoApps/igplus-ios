@@ -29,7 +29,7 @@ abstract class LocalRepository {
     required String boxKey,
   });
   Future<void> addFriend({required Friend friend, required String boxKey});
-  Future<void> removeFriend({required String friendKey, required String boxKey});
+  Future<void> removeFriend({required Friend friend, required String boxKey});
 
   Either<Failure, int> getNumberOfFriendsInBox({required String boxKey});
 

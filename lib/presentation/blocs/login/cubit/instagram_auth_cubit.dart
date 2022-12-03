@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/ig_headers.dart';
@@ -64,13 +63,16 @@ class InstagramAuthCubit extends Cubit<InstagramAuthState> {
         if (failureOrUser.isLeft()) {
           emit(const InstagramAuthFailure(message: 'Failed to update user'));
         } else {
-          emit(InstagramAuthSuccess());
+          emit(const InstagramAuthSuccess());
         }
       }
     }
   }
 
-  void createOrUpdateInstagramInfo({required String igUserId, required Map<String, dynamic> headers}) async {
+  Future<void> createOrUpdateInstagramInfo({
+    required String igUserId,
+    required Map<String, dynamic> headers,
+  }) async {
     emit(InstagramAuthInProgress());
     // get headers from instagram webview
     final failurOrIgHeaders = await getHeaders.execute(headers: headers);
@@ -103,7 +105,7 @@ class InstagramAuthCubit extends Cubit<InstagramAuthState> {
           if (failureOrSuccess.isLeft()) {
             emit(const InstagramAuthFailure(message: 'Failed to create user'));
           } else {
-            emit(InstagramAuthSuccess());
+            emit(const InstagramAuthSuccess());
           }
         } else {
           // if user exists, update user
@@ -116,16 +118,14 @@ class InstagramAuthCubit extends Cubit<InstagramAuthState> {
           if (failureOrUser.isLeft()) {
             emit(const InstagramAuthFailure(message: 'Failed to update user'));
           } else {
-            emit(InstagramAuthSuccess());
+            emit(const InstagramAuthSuccess());
           }
         }
-
-        // TODO : block user if account is private or suspended
       }
     }
   }
 
   emitInstagramAuthInitialState() {
-    emit(InstagramAuthInitial());
+    emit(const InstagramAuthInitial());
   }
 }

@@ -8,7 +8,7 @@ class UnfollowUserUseCase {
   UnfollowUserUseCase({required this.instagramRepository});
 
   // unfollow user
-  Future<Either<Failure, bool>> execute({required int userId, required IgHeaders igHeaders}) async {
+  Future<Either<Failure, bool>> execute({required String userId, required IgHeaders igHeaders}) async {
     return instagramRepository.unfollowUser(userId: userId, igHeaders: igHeaders);
   }
 }

@@ -62,8 +62,7 @@ class ReportCubit extends Cubit<ReportState> {
 
   String errorMessage = "";
 
-  void init() async {
-    late AccountInfo accountInfo;
+  void init({AccountInfo? accountInfo}) async {
     errorMessage = "";
     bool isReportSuccess = false;
 
@@ -73,9 +72,13 @@ class ReportCubit extends Cubit<ReportState> {
     // await Hive.box<StoryViewer>(StoryViewer.boxKey).clear();
     // await Hive.box<MediaCommenter>(MediaCommenter.boxKey).clear();
     emit(const ReportInProgress(loadingMessage: "We are loading your data..."));
-
-    // get cached account info from local
-    final cachedAccountInfo = getAccountInfoFromLocal();
+    late final AccountInfo? cachedAccountInfo;
+    if (accountInfo == null) {
+      // get cached account info from local
+      cachedAccountInfo = getAccountInfoFromLocal();
+    } else {
+      cachedAccountInfo = accountInfo;
+    }
 
     // show old account info
     if (cachedAccountInfo != null) {
@@ -90,6 +93,7 @@ class ReportCubit extends Cubit<ReportState> {
     if (failureOrCurrentUser.isLeft()) {
       final failure = (failureOrCurrentUser as Left).value;
       emit(ReportFailure(message: 'Failed to get user info', failure: failure));
+      return;
     } else {
       User currentUser = (failureOrCurrentUser as Right).value;
 
@@ -99,30 +103,34 @@ class ReportCubit extends Cubit<ReportState> {
           emit(ReportAccountInfoLoaded(
               accountInfo: cachedAccountInfo, loadingMessage: "Updating your account stats..."));
         }
+
         // get account info from instagram
-        final AccountInfo? accountInfoFromInstagram = await getAccountInfoFromInstagram(currentUser);
-        if (accountInfoFromInstagram != null) {
-          accountInfo = accountInfoFromInstagram;
+        final failureOrAccountInfo =
+            await getAccountInfo.execute(igUserId: currentUser.igUserId, igHeaders: currentUser.igHeaders);
+        if (failureOrAccountInfo.isLeft()) {
+          final failure = (failureOrAccountInfo as Left).value;
+          errorMessage = failure.message;
+          emit(ReportFailure(message: 'Failed to get account info', failure: failure));
+          return;
+        } else {
+          accountInfo = (failureOrAccountInfo as Right).value;
 
           // cache new account info to local
-          await cacheAccountInfoToLocalUseCase.execute(accountInfo: accountInfo);
+          await cacheAccountInfoToLocalUseCase.execute(accountInfo: accountInfo!);
 
           // reset IgDataUpdate
           await resetIgDataUpdate(DataNames.accountInfo.name);
+          if (isReportSuccess == false) {
+            emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "New account stats loaded..."));
+          }
+        }
 
-          emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "New account stats loaded..."));
-        } else {
-          accountInfo = cachedAccountInfo!;
+        if (cachedAccountInfo != null) {
+          accountInfo = cachedAccountInfo;
         }
       } else {
         // keep using cached account info
         accountInfo = cachedAccountInfo!;
-      }
-
-      // TODO check if account was changed
-      if (cachedAccountInfo != null && currentUser.igUserId != cachedAccountInfo.igUserId) {
-        // clear all boxes if user changed
-        await clearAllBoxesUseCase.execute();
       }
 
       Either<Failure, Report?>? failureOrReport;
@@ -131,17 +139,19 @@ class ReportCubit extends Cubit<ReportState> {
       failureOrReport = await getReportFromLocal.execute();
 
       if (failureOrReport.isLeft() ||
-          ((failureOrReport as Right).value.followers != accountInfo.followers ||
+          ((failureOrReport as Right).value.followers != accountInfo!.followers ||
               (failureOrReport as Right).value.followings != accountInfo.followings)) {
         // track progress of data loading from instagram
         if (failureOrReport.isLeft() || (failureOrReport as Right).value == null) {
           int loadedFriends = 0;
           Timer.periodic(const Duration(seconds: 5), (timer) {
             loadedFriends += 191;
-            if (loadedFriends < accountInfo.followers) {
-              emit(ReportAccountInfoLoaded(
-                  accountInfo: accountInfo,
-                  loadingMessage: "$loadedFriends of ${accountInfo.followers} Friends Loaded..."));
+            if (loadedFriends < accountInfo!.followers) {
+              if (isReportSuccess == false) {
+                emit(ReportAccountInfoLoaded(
+                    accountInfo: accountInfo,
+                    loadingMessage: "$loadedFriends of ${accountInfo.followers} Friends Loaded..."));
+              }
             } else {
               if (isReportSuccess == false) {
                 emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
@@ -151,20 +161,21 @@ class ReportCubit extends Cubit<ReportState> {
           });
         } else {
           if (isReportSuccess == false) {
-            emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
+            emit(ReportAccountInfoLoaded(accountInfo: accountInfo!, loadingMessage: "Analysing loaded data..."));
           }
         }
 
         // update report
-        failureOrReport = await updateReport.execute(currentUser: currentUser, accountInfo: accountInfo);
+        failureOrReport = await updateReport.execute(currentUser: currentUser, accountInfo: accountInfo!);
 
         if (failureOrReport.isLeft()) {
           final failure = (failureOrReport as Left).value;
           emit(ReportFailure(message: 'Failed to update report', failure: failure));
+          return;
         } else {
           final report = (failureOrReport as Right).value;
           isReportSuccess = true;
-          emit(ReportSuccess(report: report, accountInfo: accountInfo));
+          emit(ReportSuccess(report: report, accountInfo: accountInfo!));
         }
       } else {
         // get report from local
@@ -172,6 +183,7 @@ class ReportCubit extends Cubit<ReportState> {
         if (failureOrReport.isLeft()) {
           final failure = (failureOrReport as Left).value;
           emit(ReportFailure(message: 'Failed to get report from local', failure: failure));
+          return;
         } else {
           isReportSuccess = true;
           emit(ReportSuccess(
@@ -192,18 +204,6 @@ class ReportCubit extends Cubit<ReportState> {
       (accountInfo) => accountInfo,
     );
     return cachedAccountInfo;
-  }
-
-  getAccountInfoFromInstagram(User currentUser) async {
-    final failureOrAccountInfo =
-        await getAccountInfo.execute(igUserId: currentUser.igUserId, igHeaders: currentUser.igHeaders);
-    if (failureOrAccountInfo.isLeft()) {
-      final failure = (failureOrAccountInfo as Left).value;
-      errorMessage = failure.message;
-      emit(ReportFailure(message: 'Failed to get account info', failure: failure));
-    } else {
-      return (failureOrAccountInfo as Right).value;
-    }
   }
 
   Future<bool> checkIfDataOutdated(String dataName) async {
@@ -246,5 +246,18 @@ class ReportCubit extends Cubit<ReportState> {
       nextUpdateInMinutes: nextUpdateInMinutes,
     );
     await saveIgDataUpdateUseCase.execute(igDataUpdate: igDataUpdate);
+  }
+
+  // userChanged
+  Future<void> userChanged({required AccountInfo accountInfo}) async {
+    emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Updating your account stats..."));
+    emit(const ReportInProgress(loadingMessage: "We are loading your data..."));
+    await clearAllBoxesUseCase.execute();
+    init(accountInfo: accountInfo);
+  }
+
+  // change state
+  void changeState(ReportState state) {
+    emit(state);
   }
 }

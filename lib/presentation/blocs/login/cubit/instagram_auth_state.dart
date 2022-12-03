@@ -19,7 +19,14 @@ class InstagramAuthInProgress extends InstagramAuthState {}
 
 class InstagramAuthUserChanged extends InstagramAuthState {}
 
-class InstagramAuthSuccess extends InstagramAuthState {}
+class InstagramAuthSuccess extends InstagramAuthState {
+  final bool userChanged;
+
+  const InstagramAuthSuccess({this.userChanged = false});
+
+  @override
+  List<Object> get props => [userChanged];
+}
 
 class InstagramAuthFailure extends InstagramAuthState {
   const InstagramAuthFailure({required this.message});

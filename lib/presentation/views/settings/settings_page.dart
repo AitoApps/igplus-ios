@@ -274,7 +274,16 @@ class SettingPage extends StatelessWidget {
               );
             } else if (state is SettingsFailure) {
               return Center(
-                child: Text(state.message),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(FontAwesomeIcons.exclamationTriangle, color: ColorsManager.secondarytextColor, size: 50),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(state.message, style: const TextStyle(color: ColorsManager.secondarytextColor)),
+                    ),
+                  ],
+                ),
               );
             } else {
               return const Center(

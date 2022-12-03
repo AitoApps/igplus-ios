@@ -39,8 +39,8 @@ abstract class InstagramDataSource {
   Future<List<FriendModel>> getFollowings({required String igUserId, required Map<String, String> headers});
   Future<List<StoriesUserModel>> getUserStories({required Map<String, String> headers});
   Future<List<StoryModel?>> getStories({required String userId, required Map<String, String> headers});
-  Future<bool> followUser({required int userId, required Map<String, String> headers});
-  Future<bool> unfollowUser({required int userId, required Map<String, String> headers});
+  Future<bool> followUser({required String userId, required Map<String, String> headers});
+  Future<bool> unfollowUser({required String userId, required Map<String, String> headers});
   Future<List<MediaModel>> getUserFeed({required String userId, required Map<String, String> headers});
   Future<List<StoryViewerModel>> getStoryViewers({required String mediaId, required Map<String, String> headers});
   Future<List<MediaLikerModel>> getMediaLikers({required String mediaId, required Map<String, String> headers});
@@ -300,8 +300,8 @@ class InstagramDataSourceImp extends InstagramDataSource {
 
   // follow user
   @override
-  Future<bool> followUser({required int userId, required Map<String, String> headers}) async {
-    final response = await client.post(Uri.parse(InstagramUrls.followUser(userId.toString())), headers: headers);
+  Future<bool> followUser({required String userId, required Map<String, String> headers}) async {
+    final response = await client.post(Uri.parse(InstagramUrls.followUser(userId)), headers: headers);
 
     if (response.statusCode == 200 && response.body.contains('"status":"ok"')) {
       return true;
@@ -316,7 +316,7 @@ class InstagramDataSourceImp extends InstagramDataSource {
 
   // unfollow user
   @override
-  Future<bool> unfollowUser({required int userId, required Map<String, String> headers}) async {
+  Future<bool> unfollowUser({required String userId, required Map<String, String> headers}) async {
     final response = await client.post(Uri.parse(InstagramUrls.unfollowUser(userId.toString())), headers: headers);
     if (response.statusCode == 200 && response.body.contains('"status":"ok"')) {
       return true;

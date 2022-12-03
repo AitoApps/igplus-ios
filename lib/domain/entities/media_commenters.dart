@@ -1,6 +1,8 @@
 import 'package:igshark/domain/entities/media_commenter.dart';
 
 class MediaCommenters {
+  static const boxKey = "mediaCommentersBoxKey";
+
   final String id;
   final int commentsCount;
   final bool followedBy; // followed me

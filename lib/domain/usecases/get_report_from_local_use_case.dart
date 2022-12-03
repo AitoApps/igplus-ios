@@ -1,5 +1,4 @@
 import 'package:igshark/data/failure.dart';
-import 'package:igshark/domain/entities/friend.dart';
 import 'package:igshark/domain/entities/report.dart';
 import 'package:igshark/domain/repositories/local/local_repository.dart';
 import 'package:dartz/dartz.dart';

@@ -73,8 +73,9 @@ class _MediaCommentersListItemState extends State<MediaCommentersListItem> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FollowUnfollowButton(
-                igUserId: widget.mediaCommenters.mediaCommenterList.first.user.igUserId,
+                friend: widget.mediaCommenters.mediaCommenterList.first.user,
                 showFollow: (widget.mediaCommenters.following) ? false : true,
+                boxKey: MediaCommenters.boxKey,
               ),
               const SizedBox(height: 4),
               (widget.mediaCommenters.followedBy)

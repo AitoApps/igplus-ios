@@ -32,8 +32,6 @@ class _LoginPageState extends State<LoginPage> {
             listener: (context, state) {
               if (state is InstagramAuthSuccess) {
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                context.read<ReportCubit>().init();
-                GoRouter.of(context).goNamed('home');
               }
               if (state is InstagramAuthFailure) {
                 ScaffoldMessenger.of(context)

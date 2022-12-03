@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:igshark/domain/entities/account_info.dart';
+import 'package:igshark/domain/entities/friend.dart';
 import 'package:igshark/domain/entities/report.dart';
 import 'package:igshark/presentation/blocs/home/report/cubit/report_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
@@ -61,7 +63,7 @@ class ReportData extends StatelessWidget {
                           icon: FontAwesomeIcons.userPlus,
                           count: report!.newFollowersCycle,
                           context: context,
-                          type: "newFollowers",
+                          type: Friend.newFollowersBoxKey,
                           newFriends: report!.newFollowers,
                         )
                       : const LoadingCard(
@@ -74,7 +76,7 @@ class ReportData extends StatelessWidget {
                           icon: FontAwesomeIcons.userMinus,
                           count: report!.lostFollowersCycle,
                           context: context,
-                          type: "lostFollowers",
+                          type: Friend.lostFollowersBoxKey,
                           newFriends: report!.lostFollowers,
                         )
                       : const LoadingCard(
@@ -94,7 +96,7 @@ class ReportData extends StatelessWidget {
                       count: report!.whoAdmiresYou.length,
                       context: context,
                       style: 1,
-                      type: "whoAdmiresYou",
+                      type: Friend.whoAdmiresYouBoxKey,
                       newFriends: 0,
                       imagesStack: report!.whoAdmiresYou.map((e) => e.user.picture).toList(),
                       isSubscribed: isSubscribed,
@@ -115,7 +117,7 @@ class ReportData extends StatelessWidget {
                           icon: FontAwesomeIcons.userSlash,
                           count: report!.notFollowingBackCycle,
                           context: context,
-                          type: "notFollowingBack",
+                          type: Friend.notFollowingBackBoxKey,
                           newFriends: report!.notFollowingBack,
                         )
                       : const LoadingCard(
@@ -128,7 +130,7 @@ class ReportData extends StatelessWidget {
                           icon: FontAwesomeIcons.userInjured,
                           count: report!.youDontFollowBackCycle,
                           context: context,
-                          type: "youDontFollowBack",
+                          type: Friend.youDontFollowBackBoxKey,
                           newFriends: report!.youDontFollowBack,
                         )
                       : const LoadingCard(
@@ -149,7 +151,7 @@ class ReportData extends StatelessWidget {
                           icon: FontAwesomeIcons.userGroup,
                           count: report!.mutualFollowingsCycle,
                           context: context,
-                          type: "mutualFollowings",
+                          type: Friend.mutualFollowingsBoxKey,
                           newFriends: report!.mutualFollowings,
                         )
                       : const LoadingCard(
@@ -162,7 +164,7 @@ class ReportData extends StatelessWidget {
                           icon: FontAwesomeIcons.usersSlash,
                           count: report!.youHaveUnfollowedCycle,
                           context: context,
-                          type: "youHaveUnfollowed",
+                          type: Friend.youHaveUnfollowedBoxKey,
                           newFriends: report!.youHaveUnfollowed,
                         )
                       : const LoadingCard(
@@ -233,16 +235,22 @@ class ReportData extends StatelessWidget {
                   const SizedBox(height: 10.0),
                   ElevatedButton(
                     onPressed: () {
-                      if (errorMessage != "") {
+                      if (errorMessage == "No internet connection") {
+                        BlocProvider.of<ReportCubit>(context).init();
+                      } else if (errorMessage != "") {
                         GoRouter.of(context).goNamed('instagram_login', queryParams: {
                           'updateInstagramAccount': 'true',
                         });
-                        context.read<ReportCubit>().init();
+                        BlocProvider.of<ReportCubit>(context).init();
                       } else {
-                        context.read<ReportCubit>().init();
+                        BlocProvider.of<ReportCubit>(context).init();
                       }
                     },
-                    child: Text((errorMessage == "checkpoint required") ? "Pass checkpoint" : "Login"),
+                    child: Text((errorMessage == "checkpoint required")
+                        ? "Pass checkpoint"
+                        : (errorMessage == "No internet connection")
+                            ? "Retry"
+                            : "Login"),
                   ),
                 ],
               ),

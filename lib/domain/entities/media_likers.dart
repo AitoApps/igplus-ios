@@ -1,6 +1,8 @@
 import 'package:igshark/domain/entities/media_liker.dart';
 
 class MediaLikers {
+  static const boxKey = "mediaLikersBoxKey";
+
   final String id;
   final int likesCount;
   final bool followedBy; // followed me

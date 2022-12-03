@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'dart:io';
 
@@ -7,7 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:igshark/data/constants.dart';
+import 'package:igshark/data/models/account_info_model.dart';
+import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/usecases/get_account_info_use_case.dart';
+import 'package:igshark/presentation/blocs/home/report/cubit/report_cubit.dart';
 import 'package:igshark/presentation/blocs/login/cubit/instagram_auth_cubit.dart';
 
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -96,12 +100,18 @@ class _InstagramLoginPageState extends State<InstagramLoginPage> {
                     await http.get(Uri.parse(InstagramUrls.getAccountInfoById(useridCookies.value)), headers: headers);
 
                 if (rs.statusCode == 200 && mounted) {
-                  context.read<InstagramAuthCubit>().createOrUpdateInstagramInfo(
+                  AccountInfo accountInfo = AccountInfoModel.fromJsonById(json.decode(rs.body)).toEntity();
+                  await context.read<InstagramAuthCubit>().createOrUpdateInstagramInfo(
                         headers: headers,
                         igUserId: useridCookies.value,
                       );
+                  if (mounted) {
+                    if (widget.updateInstagramAccount == true) {
+                      BlocProvider.of<ReportCubit>(context).userChanged(accountInfo: accountInfo);
+                    }
 
-                  GoRouter.of(context).goNamed('home');
+                    GoRouter.of(context).goNamed('home');
+                  }
                   return NavigationDecision.prevent;
                 }
               }
