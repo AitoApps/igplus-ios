@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/ig_data_update.dart';
+import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/user.dart';
 import 'package:igshark/domain/repositories/auth/auth_repository.dart';
 import 'package:igshark/domain/usecases/clear_local_data_use_case.dart';
@@ -166,7 +167,7 @@ class ReportCubit extends Cubit<ReportState> {
         }
 
         // update report
-        failureOrReport = await updateReport.execute(currentUser: currentUser, accountInfo: accountInfo!);
+        failureOrReport = await updateReport.execute(currentUser: currentUser, accountInfo: accountInfo);
 
         if (failureOrReport.isLeft()) {
           final failure = (failureOrReport as Left).value;

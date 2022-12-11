@@ -1,12 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:igshark/domain/entities/media_commenter.dart';
-import 'package:igshark/domain/entities/media_liker.dart';
 import 'package:igshark/presentation/blocs/engagement/cubit/engagement_cubit.dart';
-import 'package:igshark/presentation/blocs/engagement/media_commeters/cubit/media_commenters_cubit.dart';
-import 'package:igshark/presentation/blocs/engagement/media_likers/cubit/media_likers_cubit.dart';
-import 'package:igshark/presentation/blocs/insight/media_insight/cubit/media_list_cubit.dart';
 import 'package:igshark/presentation/views/global/info_card_list.dart';
 import 'package:igshark/presentation/views/global/section_title.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -20,7 +15,7 @@ class EngagementPage extends StatefulWidget {
 
 class _EngagementPageState extends State<EngagementPage> {
   bool isSubscribed = false;
-  bool isLoading = true;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -41,11 +36,11 @@ class _EngagementPageState extends State<EngagementPage> {
 
   @override
   Widget build(BuildContext context) {
-    loadLikesAndComments(context);
     List<Map> bestFollowers = [
       {
         "title": "Most Likes",
         "context": context,
+        "subTitle": "Freinds with the most likes given",
         "type": "mostLikes",
         "locked": false,
         "isSubscribed": isSubscribed,
@@ -53,6 +48,7 @@ class _EngagementPageState extends State<EngagementPage> {
       {
         "title": "Most Comments",
         "context": context,
+        "subTitle": "Freinds with the most comments given",
         "type": "mostComments",
         "locked": false,
         "isSubscribed": isSubscribed,
@@ -114,9 +110,9 @@ class _EngagementPageState extends State<EngagementPage> {
           child: BlocConsumer<EngagementCubit, EngagementState>(
             listener: (context, state) {
               if (state is EngagementLoaded) {
-                isLoading = false;
-              } else {
-                isLoading = true;
+                setState(() {
+                  isLoading = false;
+                });
               }
             },
             builder: (context, state) {
@@ -159,19 +155,5 @@ class _EngagementPageState extends State<EngagementPage> {
         ),
       ),
     );
-  }
-
-  loadLikesAndComments(context) async {
-    BlocProvider.of<EngagementCubit>(context).setEngagmentState(EngagementLoading());
-    // initialize media data
-    await BlocProvider.of<MediaListCubit>(context).init();
-    // get likers data
-    await BlocProvider.of<MediaLikersCubit>(context).init(boxKey: MediaLiker.boxKey, pageKey: 0, pageSize: 15);
-    // wait 3 seconds
-    await Future.delayed(const Duration(seconds: 3));
-    // get commenters data
-    await BlocProvider.of<MediaCommentersCubit>(context).init(boxKey: MediaCommenter.boxKey, pageKey: 0, pageSize: 15);
-
-    BlocProvider.of<EngagementCubit>(context).setEngagmentState(EngagementLoaded());
   }
 }

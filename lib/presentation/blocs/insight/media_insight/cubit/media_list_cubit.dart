@@ -29,12 +29,14 @@ class MediaListCubit extends Cubit<MediaListState> {
     required this.cacheMediaToLocal,
     required this.getIgDataUpdateUseCase,
     required this.saveIgDataUpdateUseCase,
-  }) : super(MediaListInitial());
+  }) : super(MediaListInitial()) {
+    init();
+  }
 
   Future<void> init() async {
     emit(MediaListLoading());
 
-    // check if StoriesUser is outdated
+    // check if saved media is outdated
     bool isDataOutdated = await checkIfDataOutdated(DataNames.media.name);
 
     // get media list from local

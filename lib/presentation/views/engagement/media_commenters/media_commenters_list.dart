@@ -150,12 +150,7 @@ class _MediaCommentersListState extends State<MediaCommentersList> {
         theme: appMaterialTheme(),
         home: Scaffold(
           backgroundColor: ColorsManager.appBack,
-          body: BlocConsumer<MediaCommentersCubit, MediaCommentersState>(
-            listener: (context, state) {
-              if (state is MediaCommentersLoading) {
-                BlocProvider.of<EngagementCubit>(context).emit(EngagementLoading());
-              }
-            },
+          body: BlocBuilder<MediaCommentersCubit, MediaCommentersState>(
             builder: (context, state) {
               return (_showSearchForm)
                   ? CustomScrollView(
