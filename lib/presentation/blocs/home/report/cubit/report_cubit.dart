@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 import 'package:igshark/data/failure.dart';
 import 'package:igshark/domain/entities/account_info.dart';
 import 'package:igshark/domain/entities/ig_data_update.dart';
-import 'package:igshark/domain/entities/likes_and_comments.dart';
 import 'package:igshark/domain/entities/user.dart';
 import 'package:igshark/domain/repositories/auth/auth_repository.dart';
 import 'package:igshark/domain/usecases/clear_local_data_use_case.dart';
@@ -140,7 +139,7 @@ class ReportCubit extends Cubit<ReportState> {
       failureOrReport = await getReportFromLocal.execute();
 
       if (failureOrReport.isLeft() ||
-          ((failureOrReport as Right).value.followers != accountInfo!.followers ||
+          ((failureOrReport as Right).value.followers != accountInfo.followers ||
               (failureOrReport as Right).value.followings != accountInfo.followings)) {
         // track progress of data loading from instagram
         if (failureOrReport.isLeft() || (failureOrReport as Right).value == null) {
@@ -162,7 +161,7 @@ class ReportCubit extends Cubit<ReportState> {
           });
         } else {
           if (isReportSuccess == false) {
-            emit(ReportAccountInfoLoaded(accountInfo: accountInfo!, loadingMessage: "Analysing loaded data..."));
+            emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
           }
         }
 
@@ -176,7 +175,7 @@ class ReportCubit extends Cubit<ReportState> {
         } else {
           final report = (failureOrReport as Right).value;
           isReportSuccess = true;
-          emit(ReportSuccess(report: report, accountInfo: accountInfo!));
+          emit(ReportSuccess(report: report, accountInfo: accountInfo));
         }
       } else {
         // get report from local

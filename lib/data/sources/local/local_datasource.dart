@@ -86,7 +86,6 @@ class LocalDataSourceImp extends LocalDataSource {
       report = reportBox.get('report');
       return report;
     } catch (e) {
-      print(e);
       return null;
     }
   }
@@ -674,24 +673,24 @@ class LocalDataSourceImp extends LocalDataSource {
   // ----------------------->
   @override
   Future<void> clearAllBoxes() async {
-    await Hive.box<Friend>(Friend.followersBoxKey).clear();
-    await Hive.box<Friend>(Friend.followingsBoxKey).clear();
-    await Hive.box<Friend>(Friend.newFollowersBoxKey).clear();
-    await Hive.box<Friend>(Friend.lostFollowersBoxKey).clear();
-    await Hive.box<Friend>(Friend.notFollowingBackBoxKey).clear();
-    await Hive.box<Friend>(Friend.youDontFollowBackBoxKey).clear();
-    await Hive.box<Friend>(Friend.mutualFollowingsBoxKey).clear();
-    await Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey).clear();
-    await Hive.box<Friend>(Friend.newStoryViewersBoxKey).clear();
+    // await Hive.box<Friend>(Friend.followersBoxKey).clear();
+    // await Hive.box<Friend>(Friend.followingsBoxKey).clear();
+    // await Hive.box<Friend>(Friend.newFollowersBoxKey).clear();
+    // await Hive.box<Friend>(Friend.lostFollowersBoxKey).clear();
+    // await Hive.box<Friend>(Friend.notFollowingBackBoxKey).clear();
+    // await Hive.box<Friend>(Friend.youDontFollowBackBoxKey).clear();
+    // await Hive.box<Friend>(Friend.mutualFollowingsBoxKey).clear();
+    // await Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey).clear();
+    // await Hive.box<Friend>(Friend.newStoryViewersBoxKey).clear();
 
-    await Hive.box<Report>(Report.boxKey).clear();
+    // await Hive.box<Report>(Report.boxKey).clear();
     await Hive.box<Media>(Media.boxKey).clear();
-    await Hive.box<AccountInfo>(AccountInfo.boxKey).clear();
-    await Hive.box<StoriesUser>(StoriesUser.boxKey).clear();
-    await Hive.box<StoryViewer>(StoryViewer.boxKey).clear();
+    // await Hive.box<AccountInfo>(AccountInfo.boxKey).clear();
+    // await Hive.box<StoriesUser>(StoriesUser.boxKey).clear();
+    // await Hive.box<StoryViewer>(StoryViewer.boxKey).clear();
     await Hive.box<MediaLiker>(MediaLiker.boxKey).clear();
     await Hive.box<MediaCommenter>(MediaCommenter.boxKey).clear();
     await Hive.box<LikesAndComments>(LikesAndComments.boxKey).clear();
-    await Hive.box<IgDataUpdate>(IgDataUpdate.boxKey).clear();
+    // await Hive.box<IgDataUpdate>(IgDataUpdate.boxKey).clear();
   }
 }

@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:igshark/presentation/resources/colors_manager.dart';
 
 class LoadingIndicator extends StatelessWidget {
   const LoadingIndicator({Key? key, this.width = 15, this.height = 15, this.radius = 7.5}) : super(key: key);

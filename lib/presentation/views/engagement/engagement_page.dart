@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:igshark/presentation/blocs/engagement/cubit/engagement_cubit.dart';
 import 'package:igshark/presentation/views/global/info_card_list.dart';
+import 'package:igshark/presentation/views/global/loading_indicator.dart';
 import 'package:igshark/presentation/views/global/section_title.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -15,7 +16,6 @@ class EngagementPage extends StatefulWidget {
 
 class _EngagementPageState extends State<EngagementPage> {
   bool isSubscribed = false;
-  bool isLoading = false;
 
   @override
   void initState() {
@@ -107,49 +107,81 @@ class _EngagementPageState extends State<EngagementPage> {
         thickness: 0,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-          child: BlocConsumer<EngagementCubit, EngagementState>(
-            listener: (context, state) {
-              if (state is EngagementLoaded) {
-                setState(() {
-                  isLoading = false;
-                });
-              }
-            },
+          child: BlocBuilder<EngagementCubit, EngagementState>(
             builder: (context, state) {
-              return ListView(
-                children: <Widget>[
-                  const SectionTitle(
-                    title: "Best Followers",
-                    icon: FontAwesomeIcons.usersGear,
-                  ),
-                  InfoCardList(
-                    cards: bestFollowers,
-                    isLoading: isLoading,
-                    minHeight: 80,
-                  ),
-                  const SectionTitle(
-                    title: "Missed Connections",
-                    icon: FontAwesomeIcons.linkSlash,
-                  ),
-                  InfoCardList(
-                    cards: missedConnections,
-                    isLoading: isLoading,
-                    minHeight: 80,
-                  ),
-                  const SectionTitle(
-                    title: "Ghost Followers",
-                    icon: FontAwesomeIcons.ghost,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10.0),
-                    child: InfoCardList(
-                      cards: ghostFollowers,
-                      isLoading: isLoading,
+              if (state is EngagementLoading || state is EngagementInitial) {
+                return ListView(
+                  children: <Widget>[
+                    const SectionTitle(
+                      title: "Best Followers",
+                      icon: FontAwesomeIcons.usersGear,
+                    ),
+                    InfoCardList(
+                      cards: bestFollowers,
+                      isLoading: true,
                       minHeight: 80,
                     ),
-                  ),
-                ],
-              );
+                    const SectionTitle(
+                      title: "Missed Connections",
+                      icon: FontAwesomeIcons.linkSlash,
+                    ),
+                    InfoCardList(
+                      cards: missedConnections,
+                      isLoading: true,
+                      minHeight: 80,
+                    ),
+                    const SectionTitle(
+                      title: "Ghost Followers",
+                      icon: FontAwesomeIcons.ghost,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: InfoCardList(
+                        cards: ghostFollowers,
+                        isLoading: true,
+                        minHeight: 80,
+                      ),
+                    ),
+                  ],
+                );
+              } else if (state is EngagementLoaded) {
+                return ListView(
+                  children: <Widget>[
+                    const SectionTitle(
+                      title: "Best Followers",
+                      icon: FontAwesomeIcons.usersGear,
+                    ),
+                    InfoCardList(
+                      cards: bestFollowers,
+                      isLoading: false,
+                      minHeight: 80,
+                    ),
+                    const SectionTitle(
+                      title: "Missed Connections",
+                      icon: FontAwesomeIcons.linkSlash,
+                    ),
+                    InfoCardList(
+                      cards: missedConnections,
+                      isLoading: false,
+                      minHeight: 80,
+                    ),
+                    const SectionTitle(
+                      title: "Ghost Followers",
+                      icon: FontAwesomeIcons.ghost,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: InfoCardList(
+                        cards: ghostFollowers,
+                        isLoading: false,
+                        minHeight: 80,
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return const LoadingIndicator();
+              }
             },
           ),
         ),
