@@ -182,7 +182,13 @@ Future<void> init() async {
       ));
   sl.registerFactory(() => SubscriptionCubit());
   sl.registerFactory(() => PaywallCubit(getAccountInfoFromLocalUseCase: sl()));
-  sl.registerFactory(() => EngagementCubit());
+  sl.registerFactory(() => EngagementCubit(
+        getWhoAdmiresYouFromLocalUseCase: sl(),
+        localRepository: sl(),
+        mediaListCubit: sl(),
+        mediaLikersCubit: sl(),
+        mediaCommentersCubit: sl(),
+      ));
   sl.registerFactory(() => SettingsCubit(
         getAccountInfoFromLocalUseCase: sl(),
         clearAllBoxesUseCase: sl(),
@@ -232,7 +238,12 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetMediaCommentersUseCase(instagramRepository: sl()));
   sl.registerLazySingleton(() => CacheMediaCommentersToLocalUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => GetMediaCommentersFromLocalUseCase(localRepository: sl()));
-  sl.registerLazySingleton(() => GetWhoAdmiresYouFromLocalUseCase(localRepository: sl()));
+  sl.registerLazySingleton(() => GetWhoAdmiresYouFromLocalUseCase(
+        localRepository: sl(),
+        getMediaLikersFromLocalUseCase: sl(),
+        getMediaCommentersFromLocalUseCase: sl(),
+        getFriendsFromLocalUseCase: sl(),
+      ));
   sl.registerLazySingleton(() => GetIgDataUpdateUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => SaveIgDataUpdateUseCase(localRepository: sl()));
   sl.registerLazySingleton(() => AddFriendToLocalUseCase(localRepository: sl()));

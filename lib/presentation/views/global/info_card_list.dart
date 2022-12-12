@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -50,7 +48,9 @@ class InfoCardList extends StatelessWidget {
   }) {
     return BlocBuilder<MediaListCubit, MediaListState>(
       builder: (context, state) {
-        if (parentPage == "settings" || state is MediaListSuccess) {
+        if (isLoading) {
+          return loadingCard(context, title, subTitle);
+        } else if (parentPage == "settings" || state is MediaListSuccess) {
           return GestureDetector(
             onTap: () async {
               // locked cards
@@ -59,7 +59,7 @@ class InfoCardList extends StatelessWidget {
               }
               // setting links
               else if (type == "rateUs") {
-                String appId = Platform.isIOS ? "id1520000000" : "com.igshark.app";
+                String appId = Platform.isIOS ? "id1520000000" : "com.aitoapps.igshark";
                 await _openAppStore(appId);
               } else if (type == "mailto") {
                 _sendMail(context);
@@ -109,7 +109,7 @@ class InfoCardList extends StatelessWidget {
                   type == "mostViewedMedia") {
                 GoRouter.of(context).go('/home/mediaList/$type');
               } else {
-                // alert no page
+                // no page to show
 
               }
             },
@@ -158,9 +158,6 @@ class InfoCardList extends StatelessWidget {
               ),
             ),
           );
-        }
-        if (isLoading) {
-          return loadingCard(context, title, subTitle);
         } else if (state is MediaListInitial) {
           return loadingCard(context, title, subTitle);
         } else if (state is MediaListLoading) {

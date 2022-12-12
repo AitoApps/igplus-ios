@@ -139,7 +139,7 @@ class ReportCubit extends Cubit<ReportState> {
       failureOrReport = await getReportFromLocal.execute();
 
       if (failureOrReport.isLeft() ||
-          ((failureOrReport as Right).value.followers != accountInfo!.followers ||
+          ((failureOrReport as Right).value.followers != accountInfo.followers ||
               (failureOrReport as Right).value.followings != accountInfo.followings)) {
         // track progress of data loading from instagram
         if (failureOrReport.isLeft() || (failureOrReport as Right).value == null) {
@@ -161,12 +161,12 @@ class ReportCubit extends Cubit<ReportState> {
           });
         } else {
           if (isReportSuccess == false) {
-            emit(ReportAccountInfoLoaded(accountInfo: accountInfo!, loadingMessage: "Analysing loaded data..."));
+            emit(ReportAccountInfoLoaded(accountInfo: accountInfo, loadingMessage: "Analysing loaded data..."));
           }
         }
 
         // update report
-        failureOrReport = await updateReport.execute(currentUser: currentUser, accountInfo: accountInfo!);
+        failureOrReport = await updateReport.execute(currentUser: currentUser, accountInfo: accountInfo);
 
         if (failureOrReport.isLeft()) {
           final failure = (failureOrReport as Left).value;
@@ -175,7 +175,7 @@ class ReportCubit extends Cubit<ReportState> {
         } else {
           final report = (failureOrReport as Right).value;
           isReportSuccess = true;
-          emit(ReportSuccess(report: report, accountInfo: accountInfo!));
+          emit(ReportSuccess(report: report, accountInfo: accountInfo));
         }
       } else {
         // get report from local

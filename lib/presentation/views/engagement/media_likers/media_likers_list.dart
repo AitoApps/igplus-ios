@@ -147,12 +147,7 @@ class _MediaLikersListState extends State<MediaLikersList> {
         theme: appMaterialTheme(),
         home: Scaffold(
           backgroundColor: ColorsManager.appBack,
-          body: BlocConsumer<MediaLikersCubit, MediaLikersState>(
-            listener: (context, state) {
-              if (state is MediaLikersLoading) {
-                BlocProvider.of<EngagementCubit>(context).setEngagmentState(EngagementLoading());
-              }
-            },
+          body: BlocBuilder<MediaLikersCubit, MediaLikersState>(
             builder: (context, state) {
               return (_showSearchForm)
                   ? CustomScrollView(

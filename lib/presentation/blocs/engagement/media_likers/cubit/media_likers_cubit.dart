@@ -247,7 +247,7 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
     emit(MediaLikersLoading());
     List<LikesAndComments> mostLikesAndComments = [];
 
-    final failureOrWhoAdmiresYouListFromLocal = getWhoAdmiresYouFromLocalUseCase.execute(
+    final failureOrWhoAdmiresYouListFromLocal = await getWhoAdmiresYouFromLocalUseCase.execute(
         boxKey: LikesAndComments.boxKey, pageKey: pageKey, pageSize: pageSize, searchTerm: searchTerm);
     if (failureOrWhoAdmiresYouListFromLocal.isRight() && (failureOrWhoAdmiresYouListFromLocal as Right).value != null) {
       mostLikesAndComments = (failureOrWhoAdmiresYouListFromLocal as Right).value;
