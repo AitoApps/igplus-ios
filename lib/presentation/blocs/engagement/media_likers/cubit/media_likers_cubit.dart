@@ -83,9 +83,11 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
             await cacheMediaLikersToLocalUseCase.execute(boxKey: MediaLiker.boxKey, mediaLikersList: mediaLikers);
             // reset IgDataUpdate
             await resetIgDataUpdate(DataNames.mediaLikers.name);
+          } else {
+            return null;
           }
 
-          await Future.delayed(const Duration(seconds: 2));
+          await Future.delayed(const Duration(seconds: 3));
         }
         emit(MediaLikersSuccess(mediaLikers: mediaLikersList, pageKey: 0));
         return mediaLikersList;
@@ -95,7 +97,7 @@ class MediaLikersCubit extends Cubit<MediaLikersState> {
       }
     }
 
-    return null;
+    return mediaLikersList;
   }
 
   Future<List<MediaLiker>?> getMediaLikers({required String mediaId, required String boxKey}) async {

@@ -121,9 +121,7 @@ class SettingPage extends StatelessWidget {
                                     height: 80.0,
                                     decoration: BoxDecoration(
                                       border: Border.fromBorderSide(BorderSide(
-                                          color: (isSubscribed)
-                                              ? Color.fromARGB(255, 212, 148, 10)
-                                              : Color.fromARGB(255, 211, 211, 211),
+                                          color: (isSubscribed) ? ColorsManager.goldGradient1 : ColorsManager.textColor,
                                           width: 2)),
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
@@ -137,11 +135,11 @@ class SettingPage extends StatelessWidget {
                                       bottom: 15,
                                       right: 15,
                                       child: Shimmer.fromColors(
-                                          baseColor: const Color.fromARGB(255, 212, 148, 10),
-                                          highlightColor: const Color.fromARGB(255, 251, 255, 36),
+                                          baseColor: ColorsManager.goldGradient1,
+                                          highlightColor: ColorsManager.goldGradient2,
                                           child: const Icon(
                                             FontAwesomeIcons.crown,
-                                            color: Color.fromARGB(255, 212, 148, 10),
+                                            color: ColorsManager.goldGradient1,
                                             size: 18,
                                             shadows: [
                                               Shadow(
@@ -167,25 +165,51 @@ class SettingPage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 8.0),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        FontAwesomeIcons.star,
-                                        color: ColorsManager.secondarytextColor,
-                                        size: 12.0,
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        (isSubscribed) ? "Premium account" : "Free account",
-                                        style: const TextStyle(
-                                          color: ColorsManager.secondarytextColor,
-                                          fontSize: 12.0,
-                                          fontFamily: "Abel",
-                                          fontStyle: FontStyle.normal,
+                                  (isSubscribed)
+                                      ? Shimmer.fromColors(
+                                          baseColor: ColorsManager.goldGradient1,
+                                          highlightColor: ColorsManager.goldGradient2,
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                FontAwesomeIcons.star,
+                                                color: ColorsManager.gold,
+                                                size: 12.0,
+                                              ),
+                                              const SizedBox(width: 8.0),
+                                              Text(
+                                                "Premium account",
+                                                style: TextStyle(
+                                                  color: (isSubscribed)
+                                                      ? ColorsManager.secondarytextColor
+                                                      : ColorsManager.gold,
+                                                  fontSize: 12.0,
+                                                  fontFamily: "Abel",
+                                                  fontStyle: FontStyle.normal,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Row(
+                                          children: const [
+                                            Icon(
+                                              FontAwesomeIcons.star,
+                                              color: ColorsManager.secondarytextColor,
+                                              size: 12.0,
+                                            ),
+                                            SizedBox(width: 8.0),
+                                            Text(
+                                              "Free account",
+                                              style: TextStyle(
+                                                color: ColorsManager.secondarytextColor,
+                                                fontSize: 12.0,
+                                                fontFamily: "Abel",
+                                                fontStyle: FontStyle.normal,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
                                   const SizedBox(height: 2.0),
                                   Row(
                                     children: [

@@ -27,6 +27,11 @@ class ColorsManager {
   // arrow
   static const Color upColor = Color.fromARGB(255, 106, 245, 166);
   static const Color downColor = Color.fromARGB(255, 249, 94, 80);
+
+  // gold gradient
+  static const Color goldGradient1 = Color.fromARGB(255, 212, 148, 10);
+  static const Color goldGradient2 = Color.fromARGB(255, 251, 255, 36);
+  static const Color gold = Color.fromARGB(255, 248, 217, 13);
 }
 
 MaterialColor generateMaterialColor({required Color color}) {

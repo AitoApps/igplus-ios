@@ -11,4 +11,17 @@ class EngagementInitial extends EngagementState {}
 
 class EngagementLoading extends EngagementState {}
 
-class EngagementLoaded extends EngagementState {}
+class EngagementLoaded extends EngagementState {
+  final bool mediaLikersLoaded;
+  final bool mediaCommentersLoaded;
+
+  const EngagementLoaded({
+    required this.mediaLikersLoaded,
+    required this.mediaCommentersLoaded,
+  });
+
+  @override
+  List<Object> get props => [mediaLikersLoaded, mediaCommentersLoaded];
+}
+
+class EngagementFailure extends EngagementState {}

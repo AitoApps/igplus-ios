@@ -402,6 +402,8 @@ class InstagramDataSourceImp extends InstagramDataSource {
       return mediaLikers;
     } else if (response.statusCode == 400) {
       throw const ServerFailure("Media not found");
+    } else if (response.statusCode == 429) {
+      throw const ServerFailure("Too Many Requests");
     } else {
       throw const ServerFailure("Failed to get media likers from Instagram");
     }

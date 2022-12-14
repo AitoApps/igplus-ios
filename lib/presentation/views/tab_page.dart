@@ -31,7 +31,7 @@ class TabPage extends StatelessWidget {
               return CupertinoTabView(builder: (context) => const SafeArea(child: InsightPage()));
 
             case 2:
-              return CupertinoTabView(builder: (context) => const SafeArea(child: EngagementPage()));
+              return CupertinoTabView(builder: (context) => const EngagementPage());
 
             case 3:
               return CupertinoTabView(builder: (context) => const SafeArea(child: SettingPage()));

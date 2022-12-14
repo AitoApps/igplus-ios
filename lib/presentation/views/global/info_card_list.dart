@@ -16,8 +16,13 @@ class InfoCardList extends StatelessWidget {
   final bool isLoading;
   final double minHeight;
   final String? parentPage;
-  const InfoCardList({Key? key, required this.cards, this.isLoading = false, this.minHeight = 70.0, this.parentPage})
-      : super(key: key);
+  const InfoCardList({
+    Key? key,
+    required this.cards,
+    this.isLoading = false,
+    this.minHeight = 70.0,
+    this.parentPage,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +35,7 @@ class InfoCardList extends StatelessWidget {
         type: card["type"],
         locked: card["locked"],
         isSubscribed: card["isSubscribed"],
+        hasLoaded: card["hasLoaded"] ?? true,
       ));
     }
     return Column(
@@ -45,9 +51,13 @@ class InfoCardList extends StatelessWidget {
     String? type,
     required bool locked,
     required bool isSubscribed,
+    required bool hasLoaded,
   }) {
     return BlocBuilder<MediaListCubit, MediaListState>(
       builder: (context, state) {
+        if (hasLoaded == false) {
+          return loadingCard(context, title, subTitle, hasLoaded: hasLoaded);
+        }
         if (isLoading) {
           return loadingCard(context, title, subTitle);
         } else if (parentPage == "settings" || state is MediaListSuccess) {
@@ -170,7 +180,7 @@ class InfoCardList extends StatelessWidget {
     );
   }
 
-  Card loadingCard(context, title, subTitle) {
+  Card loadingCard(context, title, subTitle, {bool hasLoaded = true}) {
     return Card(
       color: ColorsManager.cardBack,
       elevation: 1,
@@ -201,9 +211,17 @@ class InfoCardList extends StatelessWidget {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: LoadingIndicator(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: (hasLoaded)
+                  ? const LoadingIndicator()
+                  : Column(
+                      children: const [
+                        Icon(FontAwesomeIcons.triangleExclamation, color: Colors.red, size: 18.0),
+                        SizedBox(height: 2),
+                        Text("Try later!", style: TextStyle(color: Colors.red, fontSize: 8.0)),
+                      ],
+                    ),
             ),
           ],
         ),
