@@ -50,7 +50,7 @@ class ProfileCard extends StatelessWidget {
                   height: 90.0,
                   decoration: BoxDecoration(
                     border: Border.fromBorderSide(BorderSide(
-                        color: (isSubscribed) ? Color.fromARGB(255, 212, 148, 10) : Color.fromARGB(255, 211, 211, 211),
+                        color: (isSubscribed) ? ColorsManager.goldGradient1 : Color.fromARGB(255, 211, 211, 211),
                         width: 2)),
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -64,11 +64,11 @@ class ProfileCard extends StatelessWidget {
                     bottom: 15,
                     right: 15,
                     child: Shimmer.fromColors(
-                        baseColor: const Color.fromARGB(255, 212, 148, 10),
-                        highlightColor: const Color.fromARGB(255, 251, 255, 36),
+                        baseColor: ColorsManager.goldGradient1,
+                        highlightColor: ColorsManager.goldGradient2,
                         child: const Icon(
                           FontAwesomeIcons.crown,
-                          color: Color.fromARGB(255, 212, 148, 10),
+                          color: ColorsManager.goldGradient1,
                           size: 20,
                           shadows: [
                             Shadow(

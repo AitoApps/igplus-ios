@@ -75,6 +75,8 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
                 boxKey: MediaCommenter.boxKey, mediaCommentersList: mediaCommenters);
             // reset IgDataUpdate
             await resetIgDataUpdate(DataNames.mediaCommenters.name);
+          } else {
+            return null;
           }
 
           await Future.delayed(const Duration(seconds: 2));
@@ -84,7 +86,7 @@ class MediaCommentersCubit extends Cubit<MediaCommentersState> {
       }
     }
 
-    return null;
+    return mediaCommentersList;
   }
 
   Future<List<MediaCommenter>?> getMediaCommenters({required String mediaId, required String boxKey}) async {

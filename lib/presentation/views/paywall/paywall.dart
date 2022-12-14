@@ -107,8 +107,8 @@ class _PaywallState extends State<Paywall> {
                         padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
                         child: SizedBox(
                           child: Shimmer.fromColors(
-                            baseColor: const Color.fromARGB(255, 212, 148, 10),
-                            highlightColor: const Color.fromARGB(255, 220, 255, 22),
+                            baseColor: ColorsManager.goldGradient1,
+                            highlightColor: ColorsManager.goldGradient2,
                             child: const Text(
                               'Upgrade to Premium',
                               textAlign: TextAlign.center,

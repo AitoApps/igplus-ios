@@ -75,13 +75,13 @@ class _HomePageState extends State<HomePage> {
                           GoRouter.of(context).goNamed('paywall');
                         },
                         child: Shimmer.fromColors(
-                          baseColor: const Color.fromARGB(255, 212, 148, 10),
-                          highlightColor: const Color.fromARGB(255, 220, 255, 22),
+                          baseColor: ColorsManager.goldGradient1,
+                          highlightColor: ColorsManager.goldGradient2,
                           child: Row(
                             children: const [
                               Icon(
                                 FontAwesomeIcons.crown,
-                                color: Color.fromARGB(255, 212, 148, 10),
+                                color: ColorsManager.goldGradient1,
                                 size: 14.0,
                               ),
                               SizedBox(width: 6.0),

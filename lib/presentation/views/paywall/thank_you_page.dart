@@ -48,8 +48,7 @@ class _ThankYouPageState extends State<ThankYouPage> {
                     width: 120.0,
                     height: 120.0,
                     decoration: BoxDecoration(
-                      border: const Border.fromBorderSide(
-                          BorderSide(color: const Color.fromARGB(255, 212, 148, 10), width: 2)),
+                      border: const Border.fromBorderSide(BorderSide(color: ColorsManager.goldGradient1, width: 2)),
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         fit: BoxFit.fill,
@@ -61,11 +60,11 @@ class _ThankYouPageState extends State<ThankYouPage> {
                     bottom: 15,
                     right: 20,
                     child: Shimmer.fromColors(
-                        baseColor: const Color.fromARGB(255, 212, 148, 10),
-                        highlightColor: const Color.fromARGB(255, 251, 255, 36),
+                        baseColor: ColorsManager.goldGradient1,
+                        highlightColor: ColorsManager.goldGradient2,
                         child: const Icon(
                           FontAwesomeIcons.crown,
-                          color: Color.fromARGB(255, 212, 148, 10),
+                          color: ColorsManager.goldGradient1,
                           size: 25,
                           shadows: [
                             Shadow(

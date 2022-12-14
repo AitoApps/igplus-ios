@@ -36,15 +36,15 @@ class EngagementCubit extends Cubit<EngagementState> {
     // initialize media data
     await mediaListCubit.init();
     // get likers data
-    await mediaLikersCubit.init(boxKey: MediaLiker.boxKey, pageKey: 0, pageSize: 15);
+    final mediaLikers = await mediaLikersCubit.init(boxKey: MediaLiker.boxKey, pageKey: 0, pageSize: 15);
     // wait 3 seconds
     await Future.delayed(const Duration(seconds: 3));
     // get commenters data
-    await mediaCommentersCubit.init(boxKey: MediaCommenter.boxKey, pageKey: 0, pageSize: 15);
+    final mediaCommenters = await mediaCommentersCubit.init(boxKey: MediaCommenter.boxKey, pageKey: 0, pageSize: 15);
     // get who admires you
     await getWhoAdmiresYou();
 
-    emit(EngagementLoaded());
+    emit(EngagementLoaded(mediaLikersLoaded: mediaLikers != null, mediaCommentersLoaded: mediaCommenters != null));
   }
 
   Future<void> getWhoAdmiresYou() async {
