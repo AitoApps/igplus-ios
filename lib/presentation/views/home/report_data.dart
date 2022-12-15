@@ -134,7 +134,7 @@ class ReportData extends StatelessWidget {
                           newFriends: report!.youDontFollowBack,
                         )
                       : const LoadingCard(
-                          title: "You don't Dollow Back",
+                          title: "You don't Follow Back",
                           icon: FontAwesomeIcons.userInjured,
                         ),
                 ],
