@@ -29,9 +29,7 @@ class MediaListCubit extends Cubit<MediaListState> {
     required this.cacheMediaToLocal,
     required this.getIgDataUpdateUseCase,
     required this.saveIgDataUpdateUseCase,
-  }) : super(MediaListInitial()) {
-    init();
-  }
+  }) : super(MediaListInitial());
 
   Future<void> init() async {
     emit(MediaListLoading());

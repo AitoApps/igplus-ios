@@ -24,6 +24,7 @@ import 'package:igshark/presentation/blocs/engagement/media_commeters/cubit/medi
 import 'package:igshark/presentation/blocs/engagement/media_likers/cubit/media_likers_cubit.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
 import 'package:igshark/presentation/blocs/home/report/cubit/report_cubit.dart';
+import 'package:igshark/presentation/blocs/insight/cubit/insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/cubit/stories_insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/cubit/story_viewers_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/stories_insight/story_viewers/story_download/cubit/story_download_cubit.dart';
@@ -127,6 +128,7 @@ void main() async {
         BlocProvider<SubscriptionCubit>(create: (_) => di.sl<SubscriptionCubit>()),
         BlocProvider<PaywallCubit>(create: (_) => di.sl<PaywallCubit>()),
         BlocProvider<EngagementCubit>(create: (_) => di.sl<EngagementCubit>()),
+        BlocProvider<InsightCubit>(create: (_) => di.sl<InsightCubit>()),
         BlocProvider<SettingsCubit>(create: (_) => di.sl<SettingsCubit>()),
         BlocProvider<AppBloc>(create: (_) => di.sl<AppBloc>()),
         BlocProvider<StoryDownloadCubit>(create: (_) => di.sl<StoryDownloadCubit>()),

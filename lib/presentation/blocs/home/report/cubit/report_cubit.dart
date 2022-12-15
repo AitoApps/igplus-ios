@@ -86,7 +86,7 @@ class ReportCubit extends Cubit<ReportState> {
     }
 
     // check if accountinfo is outdated
-    bool isDataOutdated = await checkIfDataOutdated(DataNames.accountInfo.name);
+    bool isDataOutdated = true; //await checkIfDataOutdated(DataNames.accountInfo.name);
 
     // get user info
     final failureOrCurrentUser = await getUser.execute();

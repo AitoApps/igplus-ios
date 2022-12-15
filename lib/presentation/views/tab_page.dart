@@ -28,7 +28,7 @@ class TabPage extends StatelessWidget {
               return CupertinoTabView(builder: (context) => const HomePage());
 
             case 1:
-              return CupertinoTabView(builder: (context) => const SafeArea(child: InsightPage()));
+              return CupertinoTabView(builder: (context) => const InsightPage());
 
             case 2:
               return CupertinoTabView(builder: (context) => const EngagementPage());
@@ -36,7 +36,7 @@ class TabPage extends StatelessWidget {
             case 3:
               return CupertinoTabView(builder: (context) => const SafeArea(child: SettingPage()));
             default:
-              return CupertinoTabView(builder: (context) => const SafeArea(child: HomePage()));
+              return CupertinoTabView(builder: (context) => const HomePage());
           }
         });
   }

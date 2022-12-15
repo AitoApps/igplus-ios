@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:igshark/presentation/blocs/insight/cubit/insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/media_insight/cubit/media_list_cubit.dart';
+import 'package:igshark/presentation/resources/colors_manager.dart';
+import 'package:igshark/presentation/resources/theme_manager.dart';
 import 'package:igshark/presentation/views/global/info_card_list.dart';
 import 'package:igshark/presentation/views/global/section_title.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -37,8 +41,6 @@ class _InsightPageState extends State<InsightPage> {
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<MediaListCubit>(context).init();
-
     List<Map> mediaInsigntCards = [
       {
         "title": "Most Popular",
@@ -108,44 +110,85 @@ class _InsightPageState extends State<InsightPage> {
         "isSubscribed": isSubscribed,
       }
     ];
-    return CupertinoPageScaffold(
-      child: CupertinoScrollbar(
-        thickness: 0,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-          child: ListView(
-            children: <Widget>[
-              // const SectionTitle(
-              //   title: "Insights",
-              //   icon: FontAwesomeIcons.chartPie,
-              // ),
-              // InfoCard(
-              //   title: "Who Admires You",
-              //   subTitle: "Find out who's intersted in you",
-              //   icon: FontAwesomeIcons.solidHeart,
-              //   count: 53,
-              //   context: context,
-              //   style: 1,
-              //   type: "whoAdmiresYou",
-              //   newFriends: 0,
-              // ),
-              const SectionTitle(
-                title: "Media insights",
-                icon: FontAwesomeIcons.images,
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        DefaultMaterialLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate,
+      ],
+      theme: appMaterialTheme(),
+      home: BlocBuilder<InsightCubit, InsightState>(
+        builder: (context, state) {
+          return Scaffold(
+            body: CupertinoPageScaffold(
+              backgroundColor: ColorsManager.appBack,
+              navigationBar: CupertinoNavigationBar(
+                backgroundColor: ColorsManager.appBack,
+                middle: const Text("Engagement", style: TextStyle(color: ColorsManager.textColor)),
+                trailing: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: GestureDetector(
+                    onTap: () {
+                      BlocProvider.of<InsightCubit>(context).init();
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text("Refresh", style: TextStyle(fontSize: 12, color: ColorsManager.secondarytextColor)),
+                        SizedBox(width: 6.0),
+                        Icon(
+                          FontAwesomeIcons.arrowsRotate,
+                          size: 20.0,
+                          color: ColorsManager.textColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              InfoCardList(
-                cards: mediaInsigntCards,
+              child: CupertinoScrollbar(
+                thickness: 0,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                  child: ListView(
+                    children: <Widget>[
+                      // const SectionTitle(
+                      //   title: "Insights",
+                      //   icon: FontAwesomeIcons.chartPie,
+                      // ),
+                      // InfoCard(
+                      //   title: "Who Admires You",
+                      //   subTitle: "Find out who's intersted in you",
+                      //   icon: FontAwesomeIcons.solidHeart,
+                      //   count: 53,
+                      //   context: context,
+                      //   style: 1,
+                      //   type: "whoAdmiresYou",
+                      //   newFriends: 0,
+                      // ),
+                      const SectionTitle(
+                        title: "Media insights",
+                        icon: FontAwesomeIcons.images,
+                      ),
+                      InfoCardList(
+                        cards: mediaInsigntCards,
+                      ),
+                      const SectionTitle(
+                        title: "Stories insights",
+                        icon: FontAwesomeIcons.circleNotch,
+                      ),
+                      InfoCardList(
+                        cards: storiesInsigntCards,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SectionTitle(
-                title: "Stories insights",
-                icon: FontAwesomeIcons.circleNotch,
-              ),
-              InfoCardList(
-                cards: storiesInsigntCards,
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
