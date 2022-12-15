@@ -6,7 +6,6 @@
 
 import 'dart:convert';
 
-import 'package:hive/hive.dart';
 import 'package:igshark/data/models/account_info_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:igshark/data/models/media_commenter_model.dart';
@@ -17,9 +16,7 @@ import 'package:igshark/data/models/stories_user.dart';
 import 'package:igshark/data/models/story_viewer_model.dart';
 
 import 'package:igshark/domain/entities/friend.dart';
-import 'package:igshark/domain/entities/stories_user.dart';
 import 'package:igshark/domain/usecases/save_friends_to_local_use_case.dart';
-import 'package:igshark/domain/usecases/update_story_by_id_use_case.dart';
 
 import '../../constants.dart';
 import '../../failure.dart';

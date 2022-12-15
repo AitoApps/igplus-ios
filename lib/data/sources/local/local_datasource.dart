@@ -149,7 +149,7 @@ class LocalDataSourceImp extends LocalDataSource {
 
     try {
       for (var e in newFriendsListToAdd) {
-        friendsBox.put(e.igUserId, e);
+        friendsBox.add(e);
       }
     } catch (e) {
       print(e);
@@ -161,26 +161,49 @@ class LocalDataSourceImp extends LocalDataSource {
   Future<void> addFriend({required Friend friend, required String boxKey}) async {
     Box<Friend> followingBox = Hive.box<Friend>(Friend.followingsBoxKey);
     Box<Friend> usersBox = Hive.box<Friend>(boxKey);
+    Box<Friend> youHaveUnfollowedBox = Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey);
 
     // set user as followed by me
     Friend newFriend = friend.copyWith(requestedByMe: true);
 
     try {
-      // add to followers box
-      followingBox.put(friend.igUserId, friend);
-      if (boxKey == Friend.youDontFollowBackBoxKey) {
-        // save new user
-        usersBox.delete(friend.igUserId);
-        Box<Friend> mutualFriendsBox = Hive.box<Friend>(Friend.mutualFollowingsBoxKey);
-        mutualFriendsBox.put(friend.igUserId, friend);
-      } else if (boxKey == Friend.mutualFollowingsBoxKey) {
-        // save new user
-        usersBox.delete(friend.igUserId);
-        Box<Friend> youDontFollowBackBox = Hive.box<Friend>(Friend.youDontFollowBackBoxKey);
-        youDontFollowBackBox.put(friend.igUserId, friend);
-      } else {
-        // update user
-        usersBox.put(friend.igUserId, newFriend);
+      // get newFriend index in followers box
+      int newFriendFollowingBoxIndex =
+          followingBox.values.toList().indexWhere((element) => element.igUserId == friend.igUserId);
+      // get newFriend index in users box
+      int newFriendUsersBoxIndex =
+          usersBox.values.toList().indexWhere((element) => element.igUserId == friend.igUserId);
+      // get newFriend index in youHaveUnfollowed box
+      int newFriendYouHaveUnfollowedBoxIndex =
+          youHaveUnfollowedBox.values.toList().indexWhere((element) => element.igUserId == friend.igUserId);
+
+      if (newFriendFollowingBoxIndex == -1) {
+        // add to followers box
+        followingBox.put(newFriendFollowingBoxIndex, friend);
+        youHaveUnfollowedBox.delete(newFriendYouHaveUnfollowedBoxIndex);
+        // youDontFollowBack
+        if (boxKey == Friend.youDontFollowBackBoxKey) {
+          // delete from youDontFollowBack
+          usersBox.delete(newFriendUsersBoxIndex);
+          Box<Friend> mutualFriendsBox = Hive.box<Friend>(Friend.mutualFollowingsBoxKey);
+          // add to mutualFollowings
+          mutualFriendsBox.put(newFriendFollowingBoxIndex, friend);
+        }
+        // Not following back
+        else if (boxKey == Friend.notFollowingBackBoxKey) {
+          // add user to notFollowingBackBoxKey
+          usersBox.put(newFriendUsersBoxIndex, friend);
+        }
+        // mutualFollowings
+        else if (boxKey == Friend.mutualFollowingsBoxKey) {
+          // add user to mutualFollowings
+          usersBox.put(newFriendUsersBoxIndex, friend);
+          Box<Friend> youDontFollowBackBox = Hive.box<Friend>(Friend.youDontFollowBackBoxKey);
+          // delete from youDontFollowBack
+          youDontFollowBackBox.delete(newFriendFollowingBoxIndex);
+        } else {
+          usersBox.put(newFriendUsersBoxIndex, newFriend);
+        }
       }
     } catch (e) {
       print(e);
@@ -191,21 +214,37 @@ class LocalDataSourceImp extends LocalDataSource {
   Future<void> removeFriend({required Friend friend, required String boxKey}) async {
     Box<Friend> followingBox = Hive.box<Friend>(Friend.followingsBoxKey);
     Box<Friend> usersBox = Hive.box<Friend>(boxKey);
+    Box<Friend> youHaveUnfollowedBox = Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey);
+
     try {
-      followingBox.delete(friend.igUserId);
-      if (boxKey == Friend.youDontFollowBackBoxKey) {
-        // save new user
-        usersBox.delete(friend.igUserId);
-        Box<Friend> youHaveUnfollowedBox = Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey);
-        youHaveUnfollowedBox.put(friend.igUserId, friend);
-      } else if (boxKey == Friend.mutualFollowingsBoxKey) {
-        // save new user
-        usersBox.delete(friend.igUserId);
-        Box<Friend> youDontFollowBackBox = Hive.box<Friend>(Friend.youDontFollowBackBoxKey);
-        youDontFollowBackBox.put(friend.igUserId, friend);
-      } else {
-        // update user
-        usersBox.delete(friend.igUserId);
+      // get newFriend index in followers box
+      int newFriendFollowingBoxIndex =
+          followingBox.values.toList().indexWhere((element) => element.igUserId == friend.igUserId);
+      // get newFriend index in users box
+      int newFriendUsersBoxIndex =
+          usersBox.values.toList().indexWhere((element) => element.igUserId == friend.igUserId);
+      // get newFriend index in youHaveUnfollowed box
+      int newFriendYouHaveUnfollowedBoxIndex =
+          youHaveUnfollowedBox.values.toList().indexWhere((element) => element.igUserId == friend.igUserId);
+      // add friend to youHaveUnfollowedBox
+      if (newFriendYouHaveUnfollowedBoxIndex == -1) {
+        youHaveUnfollowedBox.add(friend);
+      }
+
+      if (newFriendFollowingBoxIndex > -1) {
+        followingBox.delete(newFriendFollowingBoxIndex);
+        if (boxKey == Friend.youDontFollowBackBoxKey) {
+          // save new user
+          usersBox.delete(newFriendUsersBoxIndex);
+        } else if (boxKey == Friend.mutualFollowingsBoxKey) {
+          // save new user
+          usersBox.delete(newFriendUsersBoxIndex);
+          Box<Friend> youDontFollowBackBox = Hive.box<Friend>(Friend.youDontFollowBackBoxKey);
+          youDontFollowBackBox.add(friend);
+        } else {
+          // update user
+          usersBox.delete(newFriendUsersBoxIndex);
+        }
       }
     } catch (e) {
       print(e);
@@ -673,24 +712,24 @@ class LocalDataSourceImp extends LocalDataSource {
   // ----------------------->
   @override
   Future<void> clearAllBoxes() async {
-    // await Hive.box<Friend>(Friend.followersBoxKey).clear();
-    // await Hive.box<Friend>(Friend.followingsBoxKey).clear();
-    // await Hive.box<Friend>(Friend.newFollowersBoxKey).clear();
-    // await Hive.box<Friend>(Friend.lostFollowersBoxKey).clear();
-    // await Hive.box<Friend>(Friend.notFollowingBackBoxKey).clear();
-    // await Hive.box<Friend>(Friend.youDontFollowBackBoxKey).clear();
-    // await Hive.box<Friend>(Friend.mutualFollowingsBoxKey).clear();
-    // await Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey).clear();
-    // await Hive.box<Friend>(Friend.newStoryViewersBoxKey).clear();
+    await Hive.box<Friend>(Friend.followersBoxKey).clear();
+    await Hive.box<Friend>(Friend.followingsBoxKey).clear();
+    await Hive.box<Friend>(Friend.newFollowersBoxKey).clear();
+    await Hive.box<Friend>(Friend.lostFollowersBoxKey).clear();
+    await Hive.box<Friend>(Friend.notFollowingBackBoxKey).clear();
+    await Hive.box<Friend>(Friend.youDontFollowBackBoxKey).clear();
+    await Hive.box<Friend>(Friend.mutualFollowingsBoxKey).clear();
+    await Hive.box<Friend>(Friend.youHaveUnfollowedBoxKey).clear();
+    await Hive.box<Friend>(Friend.newStoryViewersBoxKey).clear();
 
-    // await Hive.box<Report>(Report.boxKey).clear();
+    await Hive.box<Report>(Report.boxKey).clear();
     await Hive.box<Media>(Media.boxKey).clear();
-    // await Hive.box<AccountInfo>(AccountInfo.boxKey).clear();
-    // await Hive.box<StoriesUser>(StoriesUser.boxKey).clear();
-    // await Hive.box<StoryViewer>(StoryViewer.boxKey).clear();
+    await Hive.box<AccountInfo>(AccountInfo.boxKey).clear();
+    await Hive.box<StoriesUser>(StoriesUser.boxKey).clear();
+    await Hive.box<StoryViewer>(StoryViewer.boxKey).clear();
     await Hive.box<MediaLiker>(MediaLiker.boxKey).clear();
     await Hive.box<MediaCommenter>(MediaCommenter.boxKey).clear();
     await Hive.box<LikesAndComments>(LikesAndComments.boxKey).clear();
-    // await Hive.box<IgDataUpdate>(IgDataUpdate.boxKey).clear();
+    await Hive.box<IgDataUpdate>(IgDataUpdate.boxKey).clear();
   }
 }
