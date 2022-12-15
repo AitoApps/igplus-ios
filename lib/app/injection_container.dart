@@ -49,6 +49,7 @@ import 'package:igshark/presentation/blocs/engagement/media_commeters/cubit/medi
 import 'package:igshark/presentation/blocs/engagement/media_likers/cubit/media_likers_cubit.dart';
 import 'package:igshark/presentation/blocs/friends_list/cubit/friends_list_cubit.dart';
 import 'package:igshark/presentation/blocs/home/report/cubit/report_cubit.dart';
+import 'package:igshark/presentation/blocs/insight/cubit/insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/media_insight/cubit/media_list_cubit.dart';
 import 'package:igshark/presentation/blocs/home/stories/cubit/stories_cubit.dart';
 import 'package:igshark/presentation/blocs/home/user_stories/cubit/user_stories_cubit.dart';
@@ -193,8 +194,8 @@ Future<void> init() async {
         getAccountInfoFromLocalUseCase: sl(),
         clearAllBoxesUseCase: sl(),
       ));
-
   sl.registerFactory(() => StoryDownloadCubit());
+  sl.registerFactory(() => InsightCubit(mediaListCubit: sl(), storiesInsightCubit: sl()));
 
   // Use cases
   sl.registerLazySingleton(() => GetAccountInfoUseCase(instagramRepository: sl()));

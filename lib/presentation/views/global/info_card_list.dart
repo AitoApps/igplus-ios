@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:igshark/app/extensions/media_query_values.dart';
+import 'package:igshark/presentation/blocs/insight/cubit/insight_cubit.dart';
 import 'package:igshark/presentation/blocs/insight/media_insight/cubit/media_list_cubit.dart';
 import 'package:igshark/presentation/blocs/settings/cubit/settings_cubit.dart';
 import 'package:igshark/presentation/resources/colors_manager.dart';
@@ -53,14 +54,14 @@ class InfoCardList extends StatelessWidget {
     required bool isSubscribed,
     required bool hasLoaded,
   }) {
-    return BlocBuilder<MediaListCubit, MediaListState>(
+    return BlocBuilder<InsightCubit, InsightState>(
       builder: (context, state) {
         if (hasLoaded == false) {
           return loadingCard(context, title, subTitle, hasLoaded: hasLoaded);
         }
         if (isLoading) {
           return loadingCard(context, title, subTitle);
-        } else if (parentPage == "settings" || state is MediaListSuccess) {
+        } else if (parentPage == "settings" || state is InsightLoaded) {
           return GestureDetector(
             onTap: () async {
               // locked cards
@@ -168,11 +169,11 @@ class InfoCardList extends StatelessWidget {
               ),
             ),
           );
-        } else if (state is MediaListInitial) {
+        } else if (state is InsightInitial) {
           return loadingCard(context, title, subTitle);
-        } else if (state is MediaListLoading) {
+        } else if (state is InsightLoading) {
           return loadingCard(context, title, subTitle);
-        } else if (state is MediaListFailure) {
+        } else if (state is InsightFailure) {
           return Center(child: Text(state.message, style: const TextStyle(color: ColorsManager.downColor)));
         }
         return const Center(child: Text("Unknown state", style: TextStyle(color: ColorsManager.textColor)));
